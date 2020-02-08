@@ -30,7 +30,7 @@
                         <div class="p-2" style="width: 100%;">
                             <label for="userName" class="sr-only">Name</label>
                             <input type="text" id="userName" class="form-control mb-3" placeholder="Name" required="">
-                            <button class="btn btn-lg btn-primary btn-block">Start</button>
+                            <button class="btn btn-lg btn-primary btn-block" onclick="app.addUser()">Start</button>
                         </div>
                         <div class="mt-auto p-2">
                             <button type="button" class="btn btn-link text-decoration-none text-muted">Privacy</button>
@@ -43,6 +43,58 @@
     </section>
     <!-- /.login-section -->
 
+    <!-- Header -->
+    <header id="header-section">
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+            <button class="btn btn-lg btn-link text-decoration-none text-white mr-2" id="sidebar-toggle"><i
+                    class="fa fa-bars"></i></button>
+            <a class="navbar-brand text-uppercase" href="index.html">Notes and Lists</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggler"
+                aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarToggler">
+                <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+                    <li class="nav-item active"><a class="nav-link" href="#">Home <span
+                                class="sr-only">(current)</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html" data-toggle="modal"
+                            data-target="#newNoteModal">New note</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+    <!-- /.header-section -->
+
+    <section id="content-section">
+        <!-- Sidebar -->
+        <div class="border-right" id="sidebar-wrapper">
+            <div class="sidebar-container p-2">
+                <button type="button" class="btn btn-outline-dark btn-lg btn-block text-left rounded-0 border-0"><i
+                        class="fa fa-sticky-note"></i> Notes</button>
+                <button type="button" class="btn btn-outline-dark btn-lg btn-block text-left rounded-0 border-0"
+                    data-toggle="modal" data-target="#newNoteModal"><i class="fa fa-plus"></i> New note</button>
+                <hr class="m-1">
+                <button type="button" class="btn btn-outline-dark btn-lg btn-block text-left rounded-0 border-0"><i
+                        class="fa fa-archive"></i> Archive</button>
+            </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Notes -->
+        <div id="notes-wrapper">
+            <div class="container-fluid">
+                <h6 class="text-uppercase mt-3">pinned</h6>
+                <hr>
+                <h6 class="text-uppercase mt-3">all notes</h6>
+                <hr>
+            </div>
+        </div>
+        <!-- /#notes-wrapper -->
+    </section id="wrapper">
+    <!-- /#content-section -->
+
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
@@ -51,7 +103,9 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous">
     </script>
+    <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
 
+    <script src="assets/js/database.js"></script>
     <script src="assets/js/script.js"></script>
 </body>
 
