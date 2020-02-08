@@ -1,5 +1,7 @@
-var userDatabase;
-var notesDatabase;
+var userDatabase; // new database variable
+var notesDatabase; // new database variable
+
+var nodeCache = {}; // new node array
 
 function initialize() {
     // Define user database
@@ -25,11 +27,15 @@ function initialize() {
     });
 
     // Define notes database
-    //
-    /*var notesDatabase = new Dexie("notesDatabase");
+    notesDatabase = new Dexie("notesDatabase");
     notesDatabase.version(1).stores({
         notes: "++noteId, noteTitle, noteContent, noteColor, noteStatus"
-    });*/
+    });
+    refreshContent();
+    // create references for the nodes that we have to work with
+    ['noteTitle', 'noteContent', 'noteColor', 'noteStatus', 'notesContainer'].forEach(function (id) {
+        nodeCache[id] = document.getElementById(id);
+    });
 }
 
 function addUser() {
@@ -48,10 +54,81 @@ function addUser() {
     });
 }
 
+function enterData() {
+    // read data from inputs…
+    var hasData;
+    var data = {};
+    ['noteTitle', 'noteContent', 'noteColor', 'noteStatus'].forEach(function (key) {
+        var value = nodeCache[key].value.trim();
+        if (value.length) {
+            hasData = true;
+            data[key] = value;
+        }
+    });
+
+    if (!hasData) {
+        return;
+    }
+
+    // …and store them away.
+    notesDatabase.transaction('rw', notesDatabase.notes, function () {
+        notesDatabase.notes.add(data);
+        console.log('Woot! Did it');
+    }).then(() => {
+        refreshContent();
+    }).catch(function (e) {
+        console.error(e.stack);
+    });
+}
+
+function refreshContent() {
+    return notesDatabase.notes.toArray()
+        .then(renderAllNotes);
+}
+
+function renderAllNotes(data) {
+    var content = '';
+    data.forEach(function (item) {
+        content += noteTemplate.card.replace(/\{([^\}]+)\}/g, function (_, key) {
+            if (item[key] === undefined) {
+                return ''; // return nothing if input is empty 
+            } else {
+                return item[key];
+            }
+        });
+    });
+
+    nodeCache['notesContainer'].innerHTML = noteTemplate.container.replace('{content}', content);
+
+    $(".card").mouseenter(function () {
+        $(this).find("#noteActionsButtons").fadeIn(200);
+    }).mouseleave(function () {
+        $(this).find("#noteActionsButtons").fadeOut(200);
+    });
+}
+
+var noteTemplate = {
+    card: '<div id="noteId_{noteId}" class="card mb-3 {noteColor}">' +
+        '<div class="card-body p-3">' +
+        '<h5 class="card-title mb-0">{noteTitle}</h5>' +
+        '<p class="card-text mb-0">{noteContent}</p>' +
+        '<div id="noteActions">' +
+        '<div id="noteActionsButtons">' +
+        '<button type="button" class="btn {noteColor}"><i class="fa fa-pencil-alt"></i></button>' +
+        '<button type="button" class="btn {noteColor}"><i class="fa fa-archive"></i></button>' +
+        '<button type="button" class="btn {noteColor}"><i class="fa fa-trash-alt"></i></button>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>',
+    container: '<div class="card-columns">{content}</div>'
+};
+
 // export some functions to the outside to
 // make the onclick="" attributes work.
 window.app = {
-    addUser: addUser
+    addUser: addUser,
+    enterData: enterData
 };
 
 // initialize app

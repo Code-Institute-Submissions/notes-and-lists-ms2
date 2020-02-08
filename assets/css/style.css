@@ -5,6 +5,17 @@ body {
   font-family: "Ubuntu", sans-serif;
 }
 
+.preloader {
+  position: fixed;
+  left: 0px;
+  top: 0px;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+  background: url("../../assets/images/loading.gif")
+    50% 50% no-repeat #ffffff;
+}
+
 #login-section {
   height: 100%;
   display: -ms-flexbox;
@@ -28,7 +39,7 @@ body {
 }
 
 .login-card .card-body {
-    height: 100%;
+  height: 100%;
 }
 
 .form-control {
@@ -37,77 +48,75 @@ body {
 }
 
 #sidebar-wrapper {
-    min-height: 100vh;
-    margin-left: -15rem;
-    -webkit-transition: margin 0.25s ease-out;
-    -moz-transition: margin 0.25s ease-out;
-    -o-transition: margin 0.25s ease-out;
-    transition: margin 0.25s ease-out;
-  }
-  
-  #sidebar-wrapper .sidebar-container {
-    width: 15rem;
-  }
-  
-  #notes-wrapper {
-    min-width: 100vw;
-  }
-  
-  #wrapper.toggled #sidebar-wrapper {
+  min-height: 100vh;
+  margin-left: -15rem;
+  -webkit-transition: margin 0.25s ease-out;
+  -moz-transition: margin 0.25s ease-out;
+  -o-transition: margin 0.25s ease-out;
+  transition: margin 0.25s ease-out;
+}
+
+#sidebar-wrapper .sidebar-container {
+  width: 15rem;
+}
+
+#notes-wrapper {
+  min-width: 100vw;
+}
+
+#wrapper.toggled #sidebar-wrapper {
+  margin-left: 0;
+}
+
+@media (min-width: 768px) {
+  #sidebar-wrapper {
     margin-left: 0;
   }
-  
-  @media (min-width: 768px) {
-    #sidebar-wrapper {
-      margin-left: 0;
-    }
-  
-    #notes-wrapper {
-      min-width: 0;
-      width: 100%;
-    }
-  
-    #content-section.toggled #sidebar-wrapper {
-      margin-left: -15rem;
-    }
+
+  #notes-wrapper {
+    min-width: 0;
+    width: 100%;
   }
-  
 
+  #content-section.toggled #sidebar-wrapper {
+    margin-left: -15rem;
+  }
+}
 
-
-
-
-
-
+#noteActions {
+  min-height: 40px;
+}
+#noteActionsButtons {
+  display: none;
+}
 
 /*------------------------------------------------------------------
 [ Responsive ]*/
 
 /*Small devices (landscape phones, 576px and up)*/
 @media (min-width: 576px) {
-    .login-card {
-      max-width: 500px;
-    }
+  .login-card {
+    max-width: 500px;
   }
-  
-  /*Medium devices (tablets, 768px and up)*/
-  @media (min-width: 768px) {
-    .login-card {
-      max-width: 600px;
-    }
+}
+
+/*Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) {
+  .login-card {
+    max-width: 600px;
   }
-  
-  /*Large devices (desktops, 992px and up)*/
-  @media (min-width: 992px) {
-    .login-card {
-      max-width: 900px;
-    }
+}
+
+/*Large devices (desktops, 992px and up)*/
+@media (min-width: 992px) {
+  .login-card {
+    max-width: 900px;
   }
-  
-  /*Extra large devices (large desktops, 1200px and up)*/
-  @media (min-width: 1200px) {
-    .login-card {
-      max-width: 1000px;
-    }
+}
+
+/*Extra large devices (large desktops, 1200px and up)*/
+@media (min-width: 1200px) {
+  .login-card {
+    max-width: 1000px;
   }
-  
+}

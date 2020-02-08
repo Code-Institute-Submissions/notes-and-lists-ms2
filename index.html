@@ -16,6 +16,8 @@
 </head>
 
 <body>
+    <div class="preloader"></div>
+
     <section id="login-section">
         <div class="card rounded-0 login-card">
             <div class="row no-gutters login-row">
@@ -89,14 +91,69 @@
                 <hr>
                 <h6 class="text-uppercase mt-3">all notes</h6>
                 <hr>
+                <div id="notesContainer"></div>
             </div>
         </div>
         <!-- /#notes-wrapper -->
     </section id="wrapper">
     <!-- /#content-section -->
 
+    <div class="modal fade" id="newNoteModal" tabindex="-1" role="dialog" aria-labelledby="newNoteModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New note</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="new-note">
+                        <input id="noteid" hidden>
+
+                        <label for="noteTitle">Title</label>
+                        <input type="text" id="noteTitle" class="form-control mb-4" placeholder="Text input">
+
+                        <label for="noteContent">Content</label>
+                        <textarea id="noteContent" class="form-control mb-4" required></textarea>
+
+                        <label for="noteColor">Color</label>
+                        <select class="custom-select mb-4" id="noteColor">
+                            <option value="bg-primary text-white">Blue</option>
+                            <option value="bg-secondary text-white">Gray</option>
+                            <option value="bg-success text-white">Green</option>
+                            <option value="bg-danger text-white">Red</option>
+                            <option value="bg-warning text-dark">Orange</option>
+                            <option value="bg-info text-white">Light Blue</option>
+                            <option value="bg-dark text-white">Black</option>
+                            <option value="bg-white text-dark" selected>White</option>
+                        </select>
+
+                        <label for="noteStatus">Status</label>
+                        <select class="custom-select mb-4" id="noteStatus">
+                            <option value="" disabled="" selected="">Choose your option</option>
+                            <option value="1">Option 1</option>
+                            <option value="2">Option 2</option>
+                            <option value="3">Option 3</option>
+                        </select>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="submitForm">Save note</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"
         integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script>
+        $(window).on('load', function(){
+            $('.preloader').fadeOut(1000);
+        });
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
         integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
     </script>
