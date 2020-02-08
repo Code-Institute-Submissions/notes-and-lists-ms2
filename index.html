@@ -89,9 +89,10 @@
             <div class="container-fluid">
                 <h6 class="text-uppercase mt-3">pinned</h6>
                 <hr>
+                <div id="pinnedItemsContainer"></div>
                 <h6 class="text-uppercase mt-3">all notes</h6>
                 <hr>
-                <div id="notesContainer"></div>
+                <div id="itemsContainer"></div>
             </div>
         </div>
         <!-- /#notes-wrapper -->
@@ -110,8 +111,6 @@
                 </div>
                 <div class="modal-body">
                     <form id="new-note">
-                        <input id="noteid" hidden>
-
                         <label for="noteTitle">Title</label>
                         <input type="text" id="noteTitle" class="form-control mb-4" placeholder="Text input">
 

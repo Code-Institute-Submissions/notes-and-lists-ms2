@@ -29,11 +29,12 @@ function initialize() {
     // Define notes database
     notesDatabase = new Dexie("notesDatabase");
     notesDatabase.version(1).stores({
-        notes: "++noteId, noteTitle, noteContent, noteColor, noteStatus"
+        notes: "++noteId, noteTitle, noteContent, noteColor, [notePinned+noteStatus]"
     });
+    refreshPinnedContent();
     refreshContent();
     // create references for the nodes that we have to work with
-    ['noteTitle', 'noteContent', 'noteColor', 'noteStatus', 'notesContainer'].forEach(function (id) {
+    ['noteTitle', 'noteContent', 'noteColor', 'pinnedItemsContainer', 'itemsContainer'].forEach(function (id) {
         nodeCache[id] = document.getElementById(id);
     });
 }
@@ -56,19 +57,13 @@ function addUser() {
 
 function addItem() {
     // read data from inputs…
-    var hasData;
-    var data = {};
-    ['noteTitle', 'noteContent', 'noteColor', 'noteStatus'].forEach(function (key) {
-        var value = nodeCache[key].value.trim();
-        if (value.length) {
-            hasData = true;
-            data[key] = value;
-        }
-    });
-
-    if (!hasData) {
-        return;
-    }
+    var data = {
+        noteTitle: document.getElementById('noteTitle').value.trim(),
+        noteContent: document.getElementById('noteContent').value.trim(),
+        noteColor: document.getElementById('noteColor').value.trim(),
+        noteStatus: 1,
+        notePinned: 0
+    };
 
     // …and store them away.
     notesDatabase.transaction('rw', notesDatabase.notes, function () {
@@ -83,11 +78,24 @@ function addItem() {
 }
 
 function refreshContent() {
-    return notesDatabase.notes.toArray()
-        .then(renderAllNotes);
+    return notesDatabase.notes.where({
+        noteStatus: 1,
+        notePinned: 0
+    }).toArray().then(function (data) {
+        (renderItems(data, false));
+    });
 }
 
-function renderAllNotes(data) {
+function refreshPinnedContent() {
+    return notesDatabase.notes.where({
+        noteStatus: 1,
+        notePinned: 1
+    }).toArray().then(function (data) {
+        (renderItems(data, true));
+    });
+}
+
+function renderItems(data, pinned) {
     var content = '';
     data.forEach(function (item) {
         content += noteTemplate.card.replace(/\{([^\}]+)\}/g, function (_, key) {
@@ -99,7 +107,11 @@ function renderAllNotes(data) {
         });
     });
 
-    nodeCache['notesContainer'].innerHTML = noteTemplate.container.replace('{content}', content);
+    if (pinned) {
+        nodeCache['pinnedItemsContainer'].innerHTML = noteTemplate.container.replace('{content}', content);
+    } else {
+        nodeCache['itemsContainer'].innerHTML = noteTemplate.container.replace('{content}', content);
+    }
 
     $(".card").mouseenter(function () {
         $(this).find("#noteActionsButtons").fadeIn(200);
@@ -109,14 +121,29 @@ function renderAllNotes(data) {
 }
 
 function clearForm() {
-    ['noteTitle', 'noteContent', 'noteColor'].forEach(function (id) {
+    ['noteTitle', 'noteContent'].forEach(function (id) {
         nodeCache[id].value = '';
+    });
+}
+
+function pinItem(id) {
+    notesDatabase.notes.get(id).then (function (item) {
+        console.log ("Friend with id : "+ id + " " + item.notePinned);
+        notesDatabase.notes.update(id, {
+            notePinned: (item.notePinned == 1) ? 0 : 1,
+        }).then(function () {
+            refreshPinnedContent();
+            refreshContent();
+        });
     });
 }
 
 function deleteItem(id) {
     notesDatabase.notes.where('noteId').equals(id).delete()
-        .then(refreshContent);
+        .then(function () {
+            refreshPinnedContent();
+            refreshContent();
+        });
 }
 
 var noteTemplate = {
@@ -127,7 +154,7 @@ var noteTemplate = {
         '<div id="noteActions">' +
         '<div id="noteActionsButtons">' +
         '<button type="button" class="btn {noteColor}"><i class="fa fa-pencil-alt"></i></button>' +
-        '<button type="button" class="btn {noteColor}"><i class="fa fa-thumbtack"></i></button>' +
+        '<button type="button" class="btn {noteColor}" onclick="pinItem({noteId})"><i class="fa fa-thumbtack"></i></button>' +
         '<button type="button" class="btn {noteColor}"><i class="fa fa-archive"></i></button>' +
         '<button type="button" class="btn {noteColor}" onclick="deleteItem({noteId})"><i class="fa fa-trash-alt"></i></button>' +
         '</div>' +
