@@ -12,12 +12,12 @@ function initialize() {
 
     Dexie.exists("userDatabase").then(function (exists) {
         if (exists) {
-            console.log("Database exists");
+            //console.log("Database exists");
             $("#login-section").hide();
             $("#header-section").show();
             $("#content-section").show().addClass("d-flex");
         } else {
-            console.log("Database doesn't exist");
+            //console.log("Database doesn't exist");
             $("#login-section").show();
             $("#header-section").hide();
             $("#content-section").hide().removeClass("d-flex");
@@ -75,8 +75,8 @@ function addItem() {
         notesDatabase.notes.add(data);
         console.log('Woot! Did it');
     }).then(() => {
-        refreshContent;
-        clearForm;
+        refreshContent();
+        clearForm();
     }).catch(function (e) {
         console.error(e.stack);
     });
