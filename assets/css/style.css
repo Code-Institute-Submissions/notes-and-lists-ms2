@@ -64,7 +64,7 @@ body {
   min-width: 100vw;
 }
 
-#wrapper.toggled #sidebar-wrapper {
+#content-section.toggled #sidebar-wrapper {
   margin-left: 0;
 }
 

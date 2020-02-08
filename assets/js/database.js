@@ -54,7 +54,7 @@ function addUser() {
     });
 }
 
-function enterData() {
+function addItem() {
     // read data from inputs…
     var hasData;
     var data = {};
@@ -75,7 +75,8 @@ function enterData() {
         notesDatabase.notes.add(data);
         console.log('Woot! Did it');
     }).then(() => {
-        refreshContent();
+        refreshContent;
+        clearForm;
     }).catch(function (e) {
         console.error(e.stack);
     });
@@ -107,6 +108,17 @@ function renderAllNotes(data) {
     });
 }
 
+function clearForm() {
+    ['noteTitle', 'noteContent', 'noteColor'].forEach(function (id) {
+        nodeCache[id].value = '';
+    });
+}
+
+function deleteItem(id) {
+    notesDatabase.notes.where('noteId').equals(id).delete()
+        .then(refreshContent);
+}
+
 var noteTemplate = {
     card: '<div id="noteId_{noteId}" class="card mb-3 {noteColor}">' +
         '<div class="card-body p-3">' +
@@ -115,8 +127,9 @@ var noteTemplate = {
         '<div id="noteActions">' +
         '<div id="noteActionsButtons">' +
         '<button type="button" class="btn {noteColor}"><i class="fa fa-pencil-alt"></i></button>' +
+        '<button type="button" class="btn {noteColor}"><i class="fa fa-thumbtack"></i></button>' +
         '<button type="button" class="btn {noteColor}"><i class="fa fa-archive"></i></button>' +
-        '<button type="button" class="btn {noteColor}"><i class="fa fa-trash-alt"></i></button>' +
+        '<button type="button" class="btn {noteColor}" onclick="deleteItem({noteId})"><i class="fa fa-trash-alt"></i></button>' +
         '</div>' +
         '</div>' +
         '</div>' +
@@ -128,7 +141,7 @@ var noteTemplate = {
 // make the onclick="" attributes work.
 window.app = {
     addUser: addUser,
-    enterData: enterData
+    addItem: addItem
 };
 
 // initialize app
