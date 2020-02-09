@@ -29,7 +29,7 @@ function initialize() {
     // Define notes database
     notesDatabase = new Dexie("notesDatabase");
     notesDatabase.version(1).stores({
-        notes: "++noteId, noteTitle, noteContent, noteColor, [notePinned+noteStatus]"
+        notes: "++noteId, noteTitle, noteContent, noteColor, noteCreated, noteUpdated, [notePinned+noteStatus]"
     });
     refreshPinnedContent();
     refreshContent();
@@ -61,6 +61,8 @@ function addItem() {
         noteTitle: document.getElementById('noteTitle').value.trim(),
         noteContent: document.getElementById('noteContent').value.trim(),
         noteColor: document.getElementById('noteColor').value.trim(),
+        noteCreated: Date.now(),
+        noteUpdated: '',
         noteStatus: 1,
         notePinned: 0
     };
@@ -99,10 +101,17 @@ function renderItems(data, pinned) {
     var content = '';
     data.forEach(function (item) {
         content += noteTemplate.card.replace(/\{([^\}]+)\}/g, function (_, key) {
+            if (pinned) {
+                $('#pinButton_' + item['noteId']).prop('title', 'Pin note');
+            } else {
+                console.log(item['noteId']);
+                $('#pinButton_' + item['noteId']).prop('title', 'Unpin note');
+            }
+        
             if (item[key] === undefined) {
                 return ''; // return nothing if input is empty 
             } else {
-                return item[key];
+                return escapeHtml(item[key]);
             }
         });
     });
@@ -113,6 +122,8 @@ function renderItems(data, pinned) {
         nodeCache['itemsContainer'].innerHTML = noteTemplate.container.replace('{content}', content);
     }
 
+    // Enable bootstrap tooltips
+    $('[data-toggle="tooltip"]').tooltip();
     $(".card").mouseenter(function () {
         $(this).find("#noteActionsButtons").fadeIn(200);
     }).mouseleave(function () {
@@ -127,8 +138,7 @@ function clearForm() {
 }
 
 function pinItem(id) {
-    notesDatabase.notes.get(id).then (function (item) {
-        console.log ("Friend with id : "+ id + " " + item.notePinned);
+    notesDatabase.notes.get(id).then(function (item) {
         notesDatabase.notes.update(id, {
             notePinned: (item.notePinned == 1) ? 0 : 1,
         }).then(function () {
@@ -138,6 +148,19 @@ function pinItem(id) {
     });
 }
 
+// get pin button tooltip title based on pin status
+function pinButtonTitle(id) {
+    notesDatabase.notes.get(id).then(function (item) {
+        notesDatabase.notes.update(id, {
+            notePinned: (item.notePinned == 1) ? 0 : 1,
+        }).then(function () {
+            refreshPinnedContent();
+            refreshContent();
+        });
+    });
+}
+
+// delete item
 function deleteItem(id) {
     notesDatabase.notes.where('noteId').equals(id).delete()
         .then(function () {
@@ -146,6 +169,7 @@ function deleteItem(id) {
         });
 }
 
+// items template
 var noteTemplate = {
     card: '<div id="noteId_{noteId}" class="card mb-3 {noteColor}">' +
         '<div class="card-body p-3">' +
@@ -153,16 +177,35 @@ var noteTemplate = {
         '<p class="card-text mb-0">{noteContent}</p>' +
         '<div id="noteActions">' +
         '<div id="noteActionsButtons">' +
-        '<button type="button" class="btn {noteColor}"><i class="fa fa-pencil-alt"></i></button>' +
-        '<button type="button" class="btn {noteColor}" onclick="pinItem({noteId})"><i class="fa fa-thumbtack"></i></button>' +
-        '<button type="button" class="btn {noteColor}"><i class="fa fa-archive"></i></button>' +
-        '<button type="button" class="btn {noteColor}" onclick="deleteItem({noteId})"><i class="fa fa-trash-alt"></i></button>' +
+        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Edit note"><i class="fa fa-pencil-alt"></i></button>' +
+        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Pin note" onclick="pinItem({noteId}) id="pinButton_{noteId}"><i class="fa fa-thumbtack"></i></button>' +
+        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Archive note"><i class="fa fa-archive"></i></button>' +
+        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Delete note" onclick="deleteItem({noteId})"><i class="fa fa-trash-alt"></i></button>' +
         '</div>' +
         '</div>' +
+        '<small class="font-weight-light font-italic">{noteCreated}</small>' +
         '</div>' +
         '</div>',
     container: '<div class="card-columns">{content}</div>'
 };
+
+// escapeHtml function from: https://stackoverflow.com/a/12034334/4007492
+var entityMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+    '/': '&#x2F;',
+    '`': '&#x60;',
+    '=': '&#x3D;'
+};
+
+function escapeHtml(string) {
+    return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+        return entityMap[s];
+    });
+}
 
 // export some functions to the outside to
 // make the onclick="" attributes work.
