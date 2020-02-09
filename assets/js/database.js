@@ -100,14 +100,7 @@ function refreshPinnedContent() {
 function renderItems(data, pinned) {
     var content = '';
     data.forEach(function (item) {
-        content += noteTemplate.card.replace(/\{([^\}]+)\}/g, function (_, key) {
-            if (pinned) {
-                $('#pinButton_' + item['noteId']).prop('title', 'Pin note');
-            } else {
-                console.log(item['noteId']);
-                $('#pinButton_' + item['noteId']).prop('title', 'Unpin note');
-            }
-        
+        content += noteTemplate.card.replace(/\{([^\}]+)\}/g, function (_, key) {        
             if (item[key] === undefined) {
                 return ''; // return nothing if input is empty 
             } else {
@@ -118,8 +111,10 @@ function renderItems(data, pinned) {
 
     if (pinned) {
         nodeCache['pinnedItemsContainer'].innerHTML = noteTemplate.container.replace('{content}', content);
+        $('#pinnedItemsContainer .pinButton').prop('title', 'Unpin note');
     } else {
         nodeCache['itemsContainer'].innerHTML = noteTemplate.container.replace('{content}', content);
+        $('#itemsContainer .pinButton').prop('title', 'Pin note');
     }
 
     // Enable bootstrap tooltips
@@ -178,7 +173,7 @@ var noteTemplate = {
         '<div id="noteActions">' +
         '<div id="noteActionsButtons">' +
         '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Edit note"><i class="fa fa-pencil-alt"></i></button>' +
-        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Pin note" onclick="pinItem({noteId}) id="pinButton_{noteId}"><i class="fa fa-thumbtack"></i></button>' +
+        '<button type="button" class="btn {noteColor} pinButton" data-toggle="tooltip" title="" onclick="pinItem({noteId})"><i class="fa fa-thumbtack"></i></button>' +
         '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Archive note"><i class="fa fa-archive"></i></button>' +
         '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Delete note" onclick="deleteItem({noteId})"><i class="fa fa-trash-alt"></i></button>' +
         '</div>' +
