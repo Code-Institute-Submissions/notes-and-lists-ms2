@@ -60,7 +60,7 @@ body {
   width: 15rem;
 }
 
-#notes-wrapper {
+#content-wrapper {
   min-width: 100vw;
 }
 
@@ -73,7 +73,7 @@ body {
     margin-left: 0;
   }
 
-  #notes-wrapper {
+  #content-wrapper {
     min-width: 0;
     width: 100%;
   }

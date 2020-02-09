@@ -10,8 +10,4 @@ $(function () { //shorthand document.ready function
         app.addItem();
         $('#newNoteModal').modal('hide');
     });
-
-    $("#submitForm").on('click', function () {
-        $("#new-note").submit();
-    });
 });

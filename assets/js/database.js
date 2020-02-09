@@ -5,56 +5,61 @@ var nodeCache = {}; // new node array for page elements
 
 function initialize() {
     // Define user database
-    userDatabase = new Dexie("userDatabase");
+    userDatabase = new Dexie('userDatabase');
     userDatabase.version(1).stores({
-        user: "name"
+        user: '++id, name'
     });
 
     // check if user database exists
     // if true, we already have the user, hide the login section
     // if false, we need an user, show the login section
-    Dexie.exists("userDatabase").then(function (exists) {
+    Dexie.exists('userDatabase').then(function (exists) {
         if (exists) {
-            //console.log("Database exists");
-            $("#login-section").hide();
-            $("#header-section").show();
-            $("#content-section").show().addClass("d-flex");
+            //console.log('Database exists');
+            $('#login-section').hide();
+            $('#header-section').show();
+            $('#content-section').show().addClass('d-flex');
+            renderUsername();
         } else {
-            //console.log("Database doesn't exist");
-            $("#login-section").show();
-            $("#header-section").hide();
-            $("#content-section").hide().removeClass("d-flex");
+            //console.log('Database doesn't exist');
+            $('#login-section').show();
+            $('#header-section').hide();
+            $('#content-section').hide().removeClass('d-flex');
         }
     }).catch(function (error) {
-        console.error("Oops, an error occurred when trying to check database existance");
+        console.error('Oops, an error occurred when trying to check database existance');
     });
 
     // Define notes database
-    notesDatabase = new Dexie("notesDatabase");
+    notesDatabase = new Dexie('notesDatabase');
     notesDatabase.version(1).stores({
-        notes: "++noteId, noteTitle, noteContent, noteColor, noteCreated, noteUpdated, [notePinned+noteStatus]"
+        notes: '++noteId, noteTitle, noteContent, noteColor, noteCreated, noteUpdated, [notePinned+noteStatus]'
     });
     refreshPinnedContent();
     refreshContent();
+    refreshArchivedContent();
     // create references for the nodes that we have to work with
-    ['noteTitle', 'noteContent', 'noteColor', 'pinnedItemsContainer', 'itemsContainer'].forEach(function (id) {
+    ['noteTitle', 'noteContent', 'noteColor', 'pinnedItemsContainer', 'itemsContainer', 'archivedItemsContainer'].forEach(function (id) {
         nodeCache[id] = document.getElementById(id);
     });
+
+    $('#archivedItemsHeader').hide();
+    $('#archivedItemsContainer').hide();
 }
 
 // add user in the database
 // we can hide the login section and show content after that
 function addUser() {
-    var username = document.getElementById("userName").value.trim();
+    var username = document.getElementById('userName').value.trim();
 
     userDatabase.transaction('rw', userDatabase.user, function () {
         userDatabase.user.add({
             name: username
         });
         //console.log('Woot! Did it');
-        $("#login-section").hide();
-        $("#header-section").show();
-        $("#content-section").show().addClass("d-flex");
+        $('#login-section').hide();
+        $('#header-section').show();
+        $('#content-section').show().addClass('d-flex');
     }).catch(function (e) {
         console.error(e.stack);
     });
@@ -91,26 +96,55 @@ function addItem() {
 // get items that are not pinned
 // on success render items
 function refreshContent() {
+    notesDatabase.notes.where({
+        noteStatus: 1,
+        notePinned: 0
+    }).count().then(function (data) {
+        (data > 0) ? $('#itemsHeader').show(): $('#itemsHeader').hide();
+    });
     return notesDatabase.notes.where({
         noteStatus: 1,
         notePinned: 0
     }).toArray().then(function (data) {
-        (renderItems(data, false));
+        (renderItems(data, false, false));
     });
 }
 
 // get pinned items
 // on success render items
 function refreshPinnedContent() {
+    notesDatabase.notes.where({
+        noteStatus: 1,
+        notePinned: 1
+    }).count().then(function (data) {
+        (data > 0) ? $('#pinnedItemsHeader').show(): $('#pinnedItemsHeader').hide();
+    });
     return notesDatabase.notes.where({
         noteStatus: 1,
         notePinned: 1
     }).toArray().then(function (data) {
-        (renderItems(data, true));
+        (renderItems(data, true, false));
     });
 }
 
-function renderItems(data, pinned) {
+// get archived items
+// on success render items
+function refreshArchivedContent() {
+    notesDatabase.notes.where({
+        noteStatus: 2,
+        notePinned: 0
+    }).count().then(function (data) {
+        //(data > 0) ? $('#archivedItemsHeader').show(): $('#archivedItemsHeader').hide();
+    });
+    return notesDatabase.notes.where({
+        noteStatus: 2,
+        notePinned: 0
+    }).toArray().then(function (data) {
+        (renderItems(data, false, true));
+    });
+}
+
+function renderItems(data, pinned, archived) {
     var content = '';
     data.forEach(function (item) {
         content += noteTemplate.card.replace(/\{([^\}]+)\}/g, function (_, key) {
@@ -125,17 +159,27 @@ function renderItems(data, pinned) {
     if (pinned) {
         nodeCache['pinnedItemsContainer'].innerHTML = noteTemplate.container.replace('{content}', content);
         $('#pinnedItemsContainer .pinButton').prop('title', 'Unpin note');
+    } else if (archived) {
+        nodeCache['archivedItemsContainer'].innerHTML = noteTemplate.container.replace('{content}', content);
+        $('#archivedItemsContainer .archiveButton').prop('title', 'Unarchive note');
     } else {
         nodeCache['itemsContainer'].innerHTML = noteTemplate.container.replace('{content}', content);
         $('#itemsContainer .pinButton').prop('title', 'Pin note');
+        $('#itemsContainer .archiveButton').prop('title', 'Archive note');
     }
 
     // Enable bootstrap tooltips
     $('[data-toggle="tooltip"]').tooltip();
-    $(".card").mouseenter(function () {
-        $(this).find("#noteActionsButtons").fadeIn(200);
+    $('.card').mouseenter(function () {
+        $(this).find('#noteActionsButtons').fadeIn(200);
     }).mouseleave(function () {
-        $(this).find("#noteActionsButtons").fadeOut(200);
+        $(this).find('#noteActionsButtons').fadeOut(200);
+    });
+}
+
+function renderUsername() {
+    userDatabase.user.get(1).then(function (data) {
+        $('#renderUsername').text(data.name);
     });
 }
 
@@ -148,11 +192,27 @@ function clearForm() {
 function pinItem(id) {
     notesDatabase.notes.get(id).then(function (item) {
         notesDatabase.notes.update(id, {
+            noteStatus: 1,
             notePinned: (item.notePinned == 1) ? 0 : 1,
         }).then(function () {
             $('[data-toggle="tooltip"]').tooltip('dispose'); // dispose button tooltip as it remains there after click
             refreshPinnedContent();
             refreshContent();
+            refreshArchivedContent();
+        });
+    });
+}
+
+function archiveItem(id) {
+    notesDatabase.notes.get(id).then(function (item) {
+        notesDatabase.notes.update(id, {
+            noteStatus: (item.noteStatus == 1) ? 2 : 1,
+            notePinned: 0
+        }).then(function (item) {
+            $('[data-toggle="tooltip"]').tooltip('dispose'); // dispose button tooltip as it remains there after click
+            refreshPinnedContent();
+            refreshContent();
+            refreshArchivedContent();
         });
     });
 }
@@ -161,8 +221,10 @@ function pinItem(id) {
 function deleteItem(id) {
     notesDatabase.notes.where('noteId').equals(id).delete()
         .then(function () {
+            $('[data-toggle="tooltip"]').tooltip('dispose'); // dispose button tooltip as it remains there after click
             refreshPinnedContent();
             refreshContent();
+            refreshArchivedContent();
         });
 }
 
@@ -176,7 +238,7 @@ var noteTemplate = {
         '<div id="noteActionsButtons">' +
         '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Edit note"><i class="fa fa-pencil-alt"></i></button>' +
         '<button type="button" class="btn {noteColor} pinButton" data-toggle="tooltip" title="" onclick="pinItem({noteId})"><i class="fa fa-thumbtack"></i></button>' +
-        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Archive note"><i class="fa fa-archive"></i></button>' +
+        '<button type="button" class="btn {noteColor} archiveButton" data-toggle="tooltip" title="Archive note" onclick="archiveItem({noteId})"><i class="fa fa-archive"></i></button>' +
         '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Delete note" onclick="deleteItem({noteId})"><i class="fa fa-trash-alt"></i></button>' +
         '</div>' +
         '</div>' +
@@ -185,6 +247,27 @@ var noteTemplate = {
         '</div>',
     container: '<div class="card-columns">{content}</div>'
 };
+
+function viewAll() {
+    $('#pinnedItemsHeader').show();
+    $('#pinnedItemsContainer').show();
+    $('#itemsHeader').show();
+    $('#itemsContainer').show();
+    $('#archivedItemsHeader').hide();
+    $('#archivedItemsContainer').hide();
+    refreshPinnedContent();
+    refreshContent();
+}
+
+function viewArchived() {
+    $('#pinnedItemsHeader').hide();
+    $('#pinnedItemsContainer').hide();
+    $('#itemsHeader').hide();
+    $('#itemsContainer').hide();
+    $('#archivedItemsHeader').show();
+    $('#archivedItemsContainer').show();
+    refreshArchivedContent();
+}
 
 // escapeHtml function from: https://stackoverflow.com/a/12034334/4007492
 var entityMap = {
@@ -207,24 +290,26 @@ function escapeHtml(string) {
 
 // get current date in DD-Mon-YYY format from: https://stackoverflow.com/a/27480352/4007492
 Date.prototype.toShortFormat = function () {
-    var month_names = ["Jan", "Feb", "Mar",
-        "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep",
-        "Oct", "Nov", "Dec"
+    var month_names = ['Jan', 'Feb', 'Mar',
+        'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep',
+        'Oct', 'Nov', 'Dec'
     ];
 
     var day = this.getDate();
     var month_index = this.getMonth();
     var year = this.getFullYear();
 
-    return day + " " + month_names[month_index] + " " + year;
+    return day + ' ' + month_names[month_index] + ' ' + year;
 }
 
 // export some functions to the outside to
-// make the onclick="" attributes work.
+// make the onclick='' attributes work.
 window.app = {
     addUser: addUser,
-    addItem: addItem
+    addItem: addItem,
+    viewAll: viewAll,
+    viewArchived: viewArchived
 };
 
 // initialize app
