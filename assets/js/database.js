@@ -100,7 +100,8 @@ function refreshContent() {
         noteStatus: 1,
         notePinned: 0
     }).count().then(function (data) {
-        (data > 0) ? $('#itemsHeader').show(): $('#itemsHeader').hide();
+        // if we are on the archive page, do not show the pinned or all items headers
+        (data > 0 && $('#archivedItemsHeader').is(":hidden")) ? $('#itemsHeader').show(): $('#itemsHeader').hide();
     });
     return notesDatabase.notes.where({
         noteStatus: 1,
@@ -117,7 +118,8 @@ function refreshPinnedContent() {
         noteStatus: 1,
         notePinned: 1
     }).count().then(function (data) {
-        (data > 0) ? $('#pinnedItemsHeader').show(): $('#pinnedItemsHeader').hide();
+        // if we are on the archive page, do not show the pinned or all items headers
+        (data > 0 && $('#archivedItemsHeader').is(":hidden")) ? $('#pinnedItemsHeader').show(): $('#pinnedItemsHeader').hide();
     });
     return notesDatabase.notes.where({
         noteStatus: 1,
@@ -208,7 +210,7 @@ function archiveItem(id) {
         notesDatabase.notes.update(id, {
             noteStatus: (item.noteStatus == 1) ? 2 : 1,
             notePinned: 0
-        }).then(function (item) {
+        }).then(function () {
             $('[data-toggle="tooltip"]').tooltip('dispose'); // dispose button tooltip as it remains there after click
             refreshPinnedContent();
             refreshContent();
