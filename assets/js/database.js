@@ -39,7 +39,7 @@ function initialize() {
     refreshContent();
     refreshArchivedContent();
     // create references for the nodes that we have to work with
-    ['noteTitle', 'noteContent', 'noteColor', 'pinnedItemsContainer', 'itemsContainer', 'archivedItemsContainer'].forEach(function (id) {
+    ['noteTitle', 'noteContent', 'noteColor', 'pinnedItemsContainer', 'itemsContainer', 'archivedItemsContainer', 'deleteModalContainer'].forEach(function (id) {
         nodeCache[id] = document.getElementById(id);
     });
 
@@ -149,7 +149,7 @@ function refreshArchivedContent() {
 function renderItems(data, pinned, archived) {
     var content = '';
     data.forEach(function (item) {
-        content += noteTemplate.card.replace(/\{([^\}]+)\}/g, function (_, key) {
+        content += template.card.replace(/\{([^\}]+)\}/g, function (_, key) {
             if (item[key] === undefined) {
                 return ''; // return nothing if input is empty 
             } else {
@@ -159,13 +159,13 @@ function renderItems(data, pinned, archived) {
     });
 
     if (pinned) {
-        nodeCache['pinnedItemsContainer'].innerHTML = noteTemplate.container.replace('{content}', content);
+        nodeCache['pinnedItemsContainer'].innerHTML = template.container.replace('{content}', content);
         $('#pinnedItemsContainer .pinButton').prop('title', 'Unpin note');
     } else if (archived) {
-        nodeCache['archivedItemsContainer'].innerHTML = noteTemplate.container.replace('{content}', content);
+        nodeCache['archivedItemsContainer'].innerHTML = template.container.replace('{content}', content);
         $('#archivedItemsContainer .archiveButton').prop('title', 'Unarchive note');
     } else {
-        nodeCache['itemsContainer'].innerHTML = noteTemplate.container.replace('{content}', content);
+        nodeCache['itemsContainer'].innerHTML = template.container.replace('{content}', content);
         $('#itemsContainer .pinButton').prop('title', 'Pin note');
         $('#itemsContainer .archiveButton').prop('title', 'Archive note');
     }
@@ -219,8 +219,15 @@ function archiveItem(id) {
     });
 }
 
+// delete item modal, get confirmation before delete
+function deleteItemModal(id) {
+    nodeCache['deleteModalContainer'].innerHTML = template.deleteItemModal.replace(/{noteId}/g, id);
+    $('#deleteItemModal_' + id).modal();
+}
+
 // delete item
 function deleteItem(id) {
+    console.log('modal?')
     notesDatabase.notes.where('noteId').equals(id).delete()
         .then(function () {
             $('[data-toggle="tooltip"]').tooltip('dispose'); // dispose button tooltip as it remains there after click
@@ -231,7 +238,7 @@ function deleteItem(id) {
 }
 
 // items template
-var noteTemplate = {
+var template = {
     card: '<div id="noteId_{noteId}" class="card mb-3 {noteColor}">' +
         '<div class="card-body p-3">' +
         '<h5 class="card-title mb-0">{noteTitle}</h5>' +
@@ -241,13 +248,26 @@ var noteTemplate = {
         '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Edit note"><i class="fa fa-pencil-alt"></i></button>' +
         '<button type="button" class="btn {noteColor} pinButton" data-toggle="tooltip" title="" onclick="pinItem({noteId})"><i class="fa fa-thumbtack"></i></button>' +
         '<button type="button" class="btn {noteColor} archiveButton" data-toggle="tooltip" title="Archive note" onclick="archiveItem({noteId})"><i class="fa fa-archive"></i></button>' +
-        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Delete note" onclick="deleteItem({noteId})"><i class="fa fa-trash-alt"></i></button>' +
+        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Delete note" onclick="deleteItemModal({noteId})"><i class="fa fa-trash-alt"></i></button>' +
         '</div>' +
         '</div>' +
         '<small class="float-right mb-2 font-weight-light font-italic">Created: {noteCreated}</small>' +
         '</div>' +
         '</div>',
-    container: '<div class="card-columns">{content}</div>'
+    container: '<div class="card-columns">{content}</div>',
+    deleteItemModal: '<div class="modal fade" id="deleteItemModal_{noteId}" tabindex="-1" role="dialog" aria-hidden="true">' +
+        '<div class="modal-dialog modal-dialog-centered" role="document">' +
+        '<div class="modal-content">' +
+        '<div class="modal-body">' +
+        '<p class="text-center">This will permanently delete the item.</p>' +
+        '</div>' +
+        '<div class="modal-footer">' +
+        '<button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>' +
+        '<button type="submit" class="btn btn-sm btn-primary" data-dismiss="modal" onclick="deleteItem({noteId})">Delete</button>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>'
 };
 
 function viewAll() {
