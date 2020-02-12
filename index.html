@@ -30,9 +30,11 @@
                             <h3 class="mb-3 text-center">Welcome</h3>
                         </div>
                         <div class="p-2" style="width: 100%;">
-                            <label for="userName" class="sr-only">Name</label>
-                            <input type="text" id="userName" class="form-control mb-3" placeholder="Name" required="">
-                            <button class="btn btn-lg btn-primary btn-block" onclick="app.addUser()">Start</button>
+                            <form id="loginForm">
+                                <label for="userName" class="sr-only">Name</label>
+                                <input type="text" id="userName" class="form-control mb-3" placeholder="Name" required>
+                                <button class="btn btn-lg btn-primary btn-block" type="submit">Start</button>
+                            </form>
                         </div>
                         <div class="mt-auto p-2">
                             <button type="button" class="btn btn-link text-decoration-none text-muted">Privacy</button>
@@ -88,7 +90,7 @@
         <!-- Items -->
         <div id="content-wrapper">
             <div class="col my-3">
-                <h3 class="font-weight-400 mb-0">Welcome, <span id="renderUsername"></span>!</h3>
+                <h3 class="font-weight-400 mb-0"><span id="renderUsername"></span></h3>
             </div>
             <div class="container-fluid">
                 <h6 id="pinnedItemsHeader" class="text-uppercase mt-3">pinned</h6>
@@ -131,7 +133,8 @@
                             <option value="bg-dark text-white">Black</option>
                             <option value="bg-white text-dark" selected>White</option>
                         </select>
-                        <button type="submit" class="btn btn-primary float-right ml-2" id="submitForm">Save note</button>
+                        <button type="submit" class="btn btn-primary float-right ml-2" id="submitForm">Save
+                            note</button>
                         <button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>
                     </form>
                 </div>
@@ -147,7 +150,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-sm btn-primary" id="logoutButton">Logout</button>
+                    <button type="submit" class="btn btn-sm btn-primary" onclick="app.logout()">Logout</button>
                 </div>
             </div>
         </div>

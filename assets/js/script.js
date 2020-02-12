@@ -5,13 +5,12 @@ $(function () { //shorthand document.ready function
         $("#content-section").toggleClass("toggled");
     });
 
-    $('#newItemForm').on('submit', function (e) {
+    $('#loginForm').on('submit', function (e) {
         e.preventDefault(); //prevent form from submitting
-        app.addItem();
-        $('#newNoteModal').modal('hide');
+        app.addUser();
     });
 
-    $('#logoutButton').on('submit', function (e) {
+    $('#newItemForm').on('submit', function (e) {
         e.preventDefault(); //prevent form from submitting
         app.addItem();
         $('#newNoteModal').modal('hide');

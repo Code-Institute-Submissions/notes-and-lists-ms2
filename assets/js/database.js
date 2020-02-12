@@ -13,21 +13,21 @@ function initialize() {
     // check if user database exists
     // if true, we already have the user, hide the login section
     // if false, we need an user, show the login section
-    Dexie.exists('userDatabase').then(function (exists) {
-        if (exists) {
+    userDatabase.user.get(1).then(function (data) {
+        if (data == undefined) {
+            //console.log('Database doesn't exist');
+            $('#login-section').show();
+            $('#header-section').hide();
+            $('#content-section').hide().removeClass('d-flex');
+        } else {
             //console.log('Database exists');
             $('#login-section').hide();
             $('#header-section').show();
             $('#content-section').show().addClass('d-flex');
             renderUsername();
-        } else {
-            //console.log('Database doesn't exist');
-            $('#login-section').show();
-            $('#header-section').hide();
-            $('#content-section').hide().removeClass('d-flex');
         }
-    }).catch(function (error) {
-        console.error('Oops, an error occurred when trying to check database existance');
+    }).catch(function (e) {
+        console.error(e.stack);
     });
 
     // Define notes database
@@ -35,9 +35,11 @@ function initialize() {
     notesDatabase.version(1).stores({
         notes: '++noteId, noteTitle, noteContent, noteColor, noteCreated, noteUpdated, [notePinned+noteStatus]'
     });
+
     refreshPinnedContent();
     refreshContent();
     refreshArchivedContent();
+
     // create references for the nodes that we have to work with
     ['noteTitle', 'noteContent', 'noteColor', 'pinnedItemsContainer', 'itemsContainer', 'archivedItemsContainer', 'deleteModalContainer'].forEach(function (id) {
         nodeCache[id] = document.getElementById(id);
@@ -181,7 +183,7 @@ function renderItems(data, pinned, archived) {
 
 function renderUsername() {
     userDatabase.user.get(1).then(function (data) {
-        $('#renderUsername').text(data.name);
+        $('#renderUsername').text(`Welcome, ${data.name}!`);
     });
 }
 
@@ -227,7 +229,6 @@ function deleteItemModal(id) {
 
 // delete item
 function deleteItem(id) {
-    console.log('modal?')
     notesDatabase.notes.where('noteId').equals(id).delete()
         .then(function () {
             $('[data-toggle="tooltip"]').tooltip('dispose'); // dispose button tooltip as it remains there after click
@@ -235,6 +236,19 @@ function deleteItem(id) {
             refreshContent();
             refreshArchivedContent();
         });
+}
+
+function logout() {
+    notesDatabase.delete().then(() => {
+        userDatabase.delete().catch((e) => {
+            console.error(e.stack);
+        });
+    }).catch((e) => {
+        console.error(e.stack);
+    }).finally(() => {
+        initialize();
+        $('#logoutModal').modal('hide');
+    });
 }
 
 // items template
@@ -331,7 +345,8 @@ window.app = {
     addUser: addUser,
     addItem: addItem,
     viewAll: viewAll,
-    viewArchived: viewArchived
+    viewArchived: viewArchived,
+    logout: logout
 };
 
 // initialize app
