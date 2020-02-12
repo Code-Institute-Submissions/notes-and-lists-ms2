@@ -41,7 +41,7 @@ function initialize() {
     refreshArchivedContent();
 
     // create references for the nodes that we have to work with
-    ['noteTitle', 'noteContent', 'noteColor', 'pinnedItemsContainer', 'itemsContainer', 'archivedItemsContainer', 'deleteModalContainer'].forEach(function (id) {
+    ['noteTitle', 'noteContent', 'noteColor', 'pinnedItemsContainer', 'itemsContainer', 'archivedItemsContainer', 'editModalContainer', 'deleteModalContainer'].forEach(function (id) {
         nodeCache[id] = document.getElementById(id);
     });
 
@@ -92,6 +92,26 @@ function addItem() {
         clearForm();
     }).catch(function (e) {
         console.error(e.stack);
+    });
+}
+
+// edit item
+// create a data array for all the data from inputs the store it in the database
+function editItem(id) {
+    // read data from inputs…
+    var today = new Date();
+
+    notesDatabase.notes.get(id).then(function (item) {
+        notesDatabase.notes.update(id, {
+            noteTitle: $('#noteTitle_' + id).val(),
+            noteContent: $('#noteContent_' + id).val(),
+            noteColor: $('#noteColor_' + id).val(),
+            noteUpdated: today.toShortFormat()
+        }).then(function () {
+            refreshPinnedContent();
+            refreshContent();
+            refreshArchivedContent();
+        });
     });
 }
 
@@ -221,6 +241,22 @@ function archiveItem(id) {
     });
 }
 
+// edit item modal
+function editItemModal(id) {
+    notesDatabase.notes.get(id).then(function (data) {
+        var content = template.editItemModal.replace(/{noteId}/g, data.noteId).replace(/{noteTitle}/g, data.noteTitle).replace(/{noteContent}/g, data.noteContent);
+
+        nodeCache['editModalContainer'].innerHTML = template.editItemModalContainer.replace('{content}', content);
+        $('#editItemModal_' + id).modal();
+
+        $('#editItemForm').on('submit', function (e) {
+            e.preventDefault(); //prevent form from submitting
+            app.editItem(id);
+            $('#editItemModal_' + id).modal('hide');
+        });
+    });
+}
+
 // delete item modal, get confirmation before delete
 function deleteItemModal(id) {
     nodeCache['deleteModalContainer'].innerHTML = template.deleteItemModal.replace(/{noteId}/g, id);
@@ -259,7 +295,7 @@ var template = {
         '<p class="card-text mb-0">{noteContent}</p>' +
         '<div id="noteActions">' +
         '<div id="noteActionsButtons">' +
-        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Edit note"><i class="fa fa-pencil-alt"></i></button>' +
+        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Edit note" onclick="editItemModal({noteId})"><i class="fa fa-pencil-alt"></i></button>' +
         '<button type="button" class="btn {noteColor} pinButton" data-toggle="tooltip" title="" onclick="pinItem({noteId})"><i class="fa fa-thumbtack"></i></button>' +
         '<button type="button" class="btn {noteColor} archiveButton" data-toggle="tooltip" title="Archive note" onclick="archiveItem({noteId})"><i class="fa fa-archive"></i></button>' +
         '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Delete note" onclick="deleteItemModal({noteId})"><i class="fa fa-trash-alt"></i></button>' +
@@ -269,6 +305,40 @@ var template = {
         '</div>' +
         '</div>',
     container: '<div class="card-columns">{content}</div>',
+    editItemModal: '<div class="modal fade" id="editItemModal_{noteId}" tabindex="-1" role="dialog" aria-hidden="true">' +
+        '<div class="modal-dialog modal-dialog-centered" role="document">' +
+        '<div class="modal-content">' +
+        '<div class="modal-header">' +
+        '<h5 class="modal-title">Edit note #{noteId}</h5>' +
+        '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+        '<span aria-hidden="true">&times;</span>' +
+        '</button>' +
+        '</div>' +
+        '<div class="modal-body">' +
+        '<form id="editItemForm">' +
+        '<label for="noteTitle_{noteId}">Title</label>' +
+        '<input type="text" id="noteTitle_{noteId}" class="form-control mb-4" value="{noteTitle}">' +
+        '<label for="noteContent_{noteId}">Content</label>' +
+        '<textarea id="noteContent_{noteId}" class="form-control mb-4" required>{noteContent}</textarea>' +
+        '<label for="noteColor_{noteId}">Color</label>' +
+        '<select class="custom-select mb-4" id="noteColor_{noteId}">' +
+        '<option value="bg-primary text-white">Blue</option>' +
+        '<option value="bg-secondary text-white">Gray</option>' +
+        '<option value="bg-success text-white">Green</option>' +
+        '<option value="bg-danger text-white">Red</option>' +
+        '<option value="bg-warning text-dark">Orange</option>' +
+        '<option value="bg-info text-white">Light Blue</option>' +
+        '<option value="bg-dark text-white">Black</option>' +
+        '<option value="bg-white text-dark">White</option>' +
+        '</select>' +
+        '<button type="submit" class="btn btn-primary float-right ml-2">Save note</button>' +
+        '<button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>' +
+        '</form>' +
+        '</div>' +
+        '</div>' +
+        '</div>' +
+        '</div>',
+    editItemModalContainer: '{content}',
     deleteItemModal: '<div class="modal fade" id="deleteItemModal_{noteId}" tabindex="-1" role="dialog" aria-hidden="true">' +
         '<div class="modal-dialog modal-dialog-centered" role="document">' +
         '<div class="modal-content">' +
@@ -344,6 +414,7 @@ Date.prototype.toShortFormat = function () {
 window.app = {
     addUser: addUser,
     addItem: addItem,
+    editItem: editItem,
     viewAll: viewAll,
     viewArchived: viewArchived,
     logout: logout
