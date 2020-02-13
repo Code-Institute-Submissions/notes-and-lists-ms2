@@ -14,7 +14,7 @@ function initialize() {
     // if true, we already have the user, hide the login section
     // if false, we need an user, show the login section
     userDatabase.user.get(1).then(function (data) {
-        if (data == undefined) {
+        if (data === undefined) {
             //console.log('Database doesn't exist');
             $('#login-section').show();
             $('#header-section').hide();
@@ -87,7 +87,7 @@ function addItem() {
     notesDatabase.transaction('rw', notesDatabase.notes, function () {
         notesDatabase.notes.add(data);
         //console.log('Woot! Did it');
-    }).then(() => {
+    }).then(function () {
         refreshContent();
         clearForm();
     }).catch(function (e) {
@@ -100,7 +100,7 @@ function addItem() {
 function editItem(id) {
     var today = new Date();
 
-    notesDatabase.notes.get(id).then(function (item) {
+    notesDatabase.notes.get(id).then(function () {
         notesDatabase.notes.update(id, {
             noteTitle: $('#noteTitle_' + id).val(),
             noteContent: $('#noteContent_' + id).val(),
@@ -153,12 +153,6 @@ function refreshPinnedContent() {
 // get archived items
 // on success render items
 function refreshArchivedContent() {
-    notesDatabase.notes.where({
-        noteStatus: 2,
-        notePinned: 0
-    }).count().then(function (data) {
-        //(data > 0) ? $('#archivedItemsHeader').show(): $('#archivedItemsHeader').hide();
-    });
     return notesDatabase.notes.where({
         noteStatus: 2,
         notePinned: 0
@@ -180,13 +174,13 @@ function renderItems(data, pinned, archived) {
     });
 
     if (pinned) {
-        nodeCache['pinnedItemsContainer'].innerHTML = template.container.replace('{content}', content);
+        nodeCache.pinnedItemsContainer.innerHTML = template.container.replace('{content}', content);
         $('#pinnedItemsContainer .pinButton').prop('title', 'Unpin note');
     } else if (archived) {
-        nodeCache['archivedItemsContainer'].innerHTML = template.container.replace('{content}', content);
+        nodeCache.archivedItemsContainer.innerHTML = template.container.replace('{content}', content);
         $('#archivedItemsContainer .archiveButton').prop('title', 'Unarchive note');
     } else {
-        nodeCache['itemsContainer'].innerHTML = template.container.replace('{content}', content);
+        nodeCache.itemsContainer.innerHTML = template.container.replace('{content}', content);
         $('#itemsContainer .pinButton').prop('title', 'Pin note');
         $('#itemsContainer .archiveButton').prop('title', 'Archive note');
     }
@@ -245,12 +239,12 @@ function editItemModal(id) {
     notesDatabase.notes.get(id).then(function (data) {
         var content = template.editItemModal.replace(/{noteId}/g, data.noteId).replace(/{noteTitle}/g, data.noteTitle).replace(/{noteContent}/g, data.noteContent);
 
-        nodeCache['editModalContainer'].innerHTML = template.editItemModalContainer.replace('{content}', content);
+        nodeCache.editModalContainer.innerHTML = template.editItemModalContainer.replace('{content}', content);
         $('#editItemModal_' + id).modal();
 
         $('#editItemForm').on('submit', function (e) {
             e.preventDefault(); //prevent form from submitting
-            app.editItem(id);
+            editItem(id);
             $('#editItemModal_' + id).modal('hide');
         });
     });
@@ -258,7 +252,7 @@ function editItemModal(id) {
 
 // delete item modal, get confirmation before delete
 function deleteItemModal(id) {
-    nodeCache['deleteModalContainer'].innerHTML = template.deleteItemModal.replace(/{noteId}/g, id);
+    nodeCache.deleteModalContainer.innerHTML = template.deleteItemModal.replace(/{noteId}/g, id);
     $('#deleteItemModal_' + id).modal();
 }
 
@@ -274,13 +268,13 @@ function deleteItem(id) {
 }
 
 function logout() {
-    notesDatabase.delete().then(() => {
-        userDatabase.delete().catch((e) => {
+    notesDatabase.delete().then(function () {
+        userDatabase.delete().catch(function (e) {
             console.error(e.stack);
         });
-    }).catch((e) => {
+    }).catch(function (e) {
         console.error(e.stack);
-    }).finally(() => {
+    }).finally(function () {
         initialize();
         $('#logoutModal').modal('hide');
     });
@@ -406,7 +400,7 @@ Date.prototype.toShortFormat = function () {
     var year = this.getFullYear();
 
     return day + ' ' + month_names[month_index] + ' ' + year;
-}
+};
 
 // export some functions to the outside to
 // make the onclick='' attributes work.
