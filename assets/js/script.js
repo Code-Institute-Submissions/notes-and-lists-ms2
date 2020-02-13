@@ -1,4 +1,17 @@
 $(function () { //shorthand document.ready function
+    if (window.document.documentMode) {
+        $('#login-section').hide();
+        $('#header-section').hide();
+        $('#content-section').hide();
+        // do IE stuff
+        let unsupportedBrowser = document.getElementById('unsupported-browser');
+        unsupportedBrowser.innerHTML = '<p><b>The browser you are using is not supported.</b><br>Some critical features are not available for your browser version. We only support the recent versions of major browsers like Chrome, Firefox, Safari, and Edge.</p>';
+        unsupportedBrowser.style.display = 'block';
+    } else {
+        // initialize app
+        initialize();
+    }
+
     // sidebar toggle
     $("#sidebar-toggle").click(function (e) {
         e.preventDefault();
@@ -7,12 +20,12 @@ $(function () { //shorthand document.ready function
 
     $('#loginForm').on('submit', function (e) {
         e.preventDefault(); //prevent form from submitting
-        app.addUser();
+        addUser();
     });
 
     $('#newItemForm').on('submit', function (e) {
         e.preventDefault(); //prevent form from submitting
-        app.addItem();
+        addItem();
         $('#newNoteModal').modal('hide');
     });
 });

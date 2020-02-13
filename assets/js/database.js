@@ -98,7 +98,6 @@ function addItem() {
 // edit item
 // create a data array for all the data from inputs the store it in the database
 function editItem(id) {
-    // read data from inputs…
     var today = new Date();
 
     notesDatabase.notes.get(id).then(function (item) {
@@ -412,6 +411,7 @@ Date.prototype.toShortFormat = function () {
 // export some functions to the outside to
 // make the onclick='' attributes work.
 window.app = {
+    initialize: initialize,
     addUser: addUser,
     addItem: addItem,
     editItem: editItem,
@@ -419,6 +419,3 @@ window.app = {
     viewArchived: viewArchived,
     logout: logout
 };
-
-// initialize app
-initialize();
