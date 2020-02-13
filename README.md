@@ -38,7 +38,9 @@ The app allows users to add notes with a title, content and color. Users can pin
 
 ### Future plans
 
-The main feature that is required is to make Internet Explorer compatible with indexeddb API (using IndexedDBShim). Some other features include adding images/videos to the notes, categorize notes with a label, drag and drop features, instead of delete confirmation add "Undo" option and also notes reminders.
+The main feature that is required is to make Internet Explorer compatible with indexeddb API (using IndexedDBShim). Some other features include adding images/videos to the notes, categorize notes with a label, drag and drop features, instead of delete confirmation add "Undo" option, add toasts for notifications and also add notes reminders.
+
+## Testing
 
 ## Deployment
 

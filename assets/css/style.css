@@ -96,7 +96,9 @@ body {
 #noteActionsButtons {
   display: none;
 }
-
+#renderUsername {
+  font-size: 32px;
+}
 /*------------------------------------------------------------------
 [ Responsive ]*/
 
