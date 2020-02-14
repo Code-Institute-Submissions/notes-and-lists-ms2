@@ -47,6 +47,8 @@ function initialize() {
 
     $('#archivedItemsHeader').hide();
     $('#archivedItemsContainer').hide();
+
+    noteColors('#noteColor');
 }
 
 // add user in the database
@@ -223,7 +225,7 @@ function pinItem(id) {
 function archiveItem(id) {
     notesDatabase.notes.get(id).then(function (item) {
         notesDatabase.notes.update(id, {
-            noteStatus: (item.noteStatus == 1) ? 2 : 1,
+            noteStatus: (item.noteStatus === 1) ? 2 : 1,
             notePinned: 0
         }).then(function () {
             $('[data-toggle="tooltip"]').tooltip('dispose'); // dispose button tooltip as it remains there after click
@@ -240,6 +242,7 @@ function editItemModal(id) {
         var content = template.editItemModal.replace(/{noteId}/g, data.noteId).replace(/{noteTitle}/g, data.noteTitle).replace(/{noteContent}/g, data.noteContent);
 
         nodeCache.editModalContainer.innerHTML = template.editItemModalContainer.replace('{content}', content);
+        noteColors('#noteColor_' + id, data.noteColor);
         $('#editItemModal_' + id).modal();
 
         $('#editItemForm').on('submit', function (e) {
@@ -282,8 +285,7 @@ function logout() {
 
 // items template
 var template = {
-    card: '<div id="noteId_{noteId}" class="card mb-3 {noteColor}">' +
-        '<div class="card-body p-3">' +
+    card: '<div id="noteId_{noteId}" class="card mb-3 {noteColor}"><div class="card-body p-3">' +
         '<h5 class="card-title mb-0">{noteTitle}</h5>' +
         '<p class="card-text mb-0">{noteContent}</p>' +
         '<div id="noteActions">' +
@@ -292,11 +294,9 @@ var template = {
         '<button type="button" class="btn {noteColor} pinButton" data-toggle="tooltip" title="" onclick="pinItem({noteId})"><i class="fa fa-thumbtack"></i></button>' +
         '<button type="button" class="btn {noteColor} archiveButton" data-toggle="tooltip" title="Archive note" onclick="archiveItem({noteId})"><i class="fa fa-archive"></i></button>' +
         '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Delete note" onclick="deleteItemModal({noteId})"><i class="fa fa-trash-alt"></i></button>' +
-        '</div>' +
-        '</div>' +
+        '</div></div>' +
         '<small class="float-right mb-2 font-weight-light font-italic">Created: {noteCreated}</small>' +
-        '</div>' +
-        '</div>',
+        '</div></div>',
     container: '<div class="card-columns">{content}</div>',
     editItemModal: '<div class="modal fade" id="editItemModal_{noteId}" tabindex="-1" role="dialog" aria-hidden="true">' +
         '<div class="modal-dialog modal-dialog-centered" role="document">' +
@@ -315,22 +315,10 @@ var template = {
         '<textarea id="noteContent_{noteId}" class="form-control mb-4" required>{noteContent}</textarea>' +
         '<label for="noteColor_{noteId}">Color</label>' +
         '<select class="custom-select mb-4" id="noteColor_{noteId}">' +
-        '<option value="bg-primary text-white">Blue</option>' +
-        '<option value="bg-secondary text-white">Gray</option>' +
-        '<option value="bg-success text-white">Green</option>' +
-        '<option value="bg-danger text-white">Red</option>' +
-        '<option value="bg-warning text-dark">Orange</option>' +
-        '<option value="bg-info text-white">Light Blue</option>' +
-        '<option value="bg-dark text-white">Black</option>' +
-        '<option value="bg-white text-dark">White</option>' +
         '</select>' +
         '<button type="submit" class="btn btn-primary float-right ml-2">Save note</button>' +
         '<button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>' +
-        '</form>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>',
+        '</form></div></div></div></div>',
     editItemModalContainer: '{content}',
     deleteItemModal: '<div class="modal fade" id="deleteItemModal_{noteId}" tabindex="-1" role="dialog" aria-hidden="true">' +
         '<div class="modal-dialog modal-dialog-centered" role="document">' +
@@ -341,10 +329,7 @@ var template = {
         '<div class="modal-footer">' +
         '<button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>' +
         '<button type="submit" class="btn btn-sm btn-primary" data-dismiss="modal" onclick="deleteItem({noteId})">Delete</button>' +
-        '</div>' +
-        '</div>' +
-        '</div>' +
-        '</div>'
+        '</div></div></div></div>'
 };
 
 function viewAll() {
@@ -366,6 +351,30 @@ function viewArchived() {
     $('#archivedItemsHeader').show();
     $('#archivedItemsContainer').show();
     refreshArchivedContent();
+}
+
+function noteColors(selectId, selectedColor = 'bg-white text-dark') {
+    let colors = {
+        'bg-primary text-white': 'Blue',
+        'bg-secondary text-white': 'Gray',
+        'bg-success text-white': 'Green',
+        'bg-danger text-white': 'Red',
+        'bg-warning text-dark': 'Orange',
+        'bg-info text-white': 'Light Blue',
+        'bg-dark text-white': 'Black',
+        'bg-white text-dark': 'White'
+    };
+    let select = $(selectId);
+    let options = select.prop('options');
+
+    // remove all the existing options
+    $('option', select).remove();
+
+    // loop through the options and add them to the select
+    $.each(colors, function (val, text) {
+        options[options.length] = new Option(text, val);
+    });
+    select.val(selectedColor);
 }
 
 // escapeHtml function from: https://stackoverflow.com/a/12034334/4007492
