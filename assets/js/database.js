@@ -3,6 +3,208 @@ var notesDatabase; // new database variable
 
 var nodeCache = {}; // new node array for page elements
 
+function renderUsername() {
+    userDatabase.user.get(1).then(function (data) {
+        $('#renderUsername').text(`Welcome, ${data.name}!`);
+    });
+}
+
+// escapeHtml function from: https://stackoverflow.com/a/12034334/4007492
+var entityMap = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+    '/': '&#x2F;',
+    '`': '&#x60;',
+    '=': '&#x3D;'
+};
+
+function escapeHtml(string) {
+    return String(string).replace(/[&<>"'`=\/]/g, function (s) {
+        return entityMap[s];
+    });
+}
+
+// items template
+var template = {
+    card: '<div id="noteId_{noteId}" class="card mb-3 {noteColor}"><div class="card-body p-3">' +
+        '<h5 class="card-title mb-0">{noteTitle}</h5>' +
+        '<p class="card-text mb-0">{noteContent}</p>' +
+        '<div id="noteActions">' +
+        '<div id="noteActionsButtons">' +
+        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Edit note" onclick="editItemModal({noteId})"><i class="fa fa-pencil-alt"></i></button>' +
+        '<button type="button" class="btn {noteColor} pinButton" data-toggle="tooltip" title="" onclick="pinItem({noteId})"><i class="fa fa-thumbtack"></i></button>' +
+        '<button type="button" class="btn {noteColor} archiveButton" data-toggle="tooltip" title="Archive note" onclick="archiveItem({noteId})"><i class="fa fa-archive"></i></button>' +
+        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Delete note" onclick="deleteItemModal({noteId})"><i class="fa fa-trash-alt"></i></button>' +
+        '</div></div>' +
+        '<small class="float-right mb-2 font-weight-light font-italic">Created: {noteCreated}</small>' +
+        '</div></div>',
+    container: '<div class="card-columns">{content}</div>',
+    editItemModal: '<div class="modal fade" id="editItemModal_{noteId}" tabindex="-1" role="dialog" aria-hidden="true">' +
+        '<div class="modal-dialog modal-dialog-centered" role="document">' +
+        '<div class="modal-content">' +
+        '<div class="modal-header">' +
+        '<h5 class="modal-title">Edit note #{noteId}</h5>' +
+        '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
+        '<span aria-hidden="true">&times;</span>' +
+        '</button>' +
+        '</div>' +
+        '<div class="modal-body">' +
+        '<form id="editItemForm">' +
+        '<label for="noteTitle_{noteId}">Title</label>' +
+        '<input type="text" id="noteTitle_{noteId}" class="form-control mb-4" value="{noteTitle}">' +
+        '<label for="noteContent_{noteId}">Content</label>' +
+        '<textarea id="noteContent_{noteId}" class="form-control mb-4" required>{noteContent}</textarea>' +
+        '<label for="noteColor_{noteId}">Color</label>' +
+        '<select class="custom-select mb-4" id="noteColor_{noteId}">' +
+        '</select>' +
+        '<button type="submit" class="btn btn-primary float-right ml-2">Save note</button>' +
+        '<button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>' +
+        '</form></div></div></div></div>',
+    editItemModalContainer: '{content}',
+    deleteItemModal: '<div class="modal fade" id="deleteItemModal_{noteId}" tabindex="-1" role="dialog" aria-hidden="true">' +
+        '<div class="modal-dialog modal-dialog-centered" role="document">' +
+        '<div class="modal-content">' +
+        '<div class="modal-body">' +
+        '<p class="text-center">This will permanently delete the item.</p>' +
+        '</div>' +
+        '<div class="modal-footer">' +
+        '<button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>' +
+        '<button type="submit" class="btn btn-sm btn-primary" data-dismiss="modal" onclick="deleteItem({noteId})">Delete</button>' +
+        '</div></div></div></div>'
+};
+
+function renderItems(data, pinned, archived) {
+    var content = '';
+    data.forEach(function (item) {
+        content += template.card.replace(/\{([^\}]+)\}/g, function (_, key) {
+            if (item[key] === undefined) {
+                return ''; // return nothing if input is empty 
+            } else {
+                return escapeHtml(item[key]);
+            }
+        });
+    });
+
+    if (pinned) {
+        nodeCache.pinnedItemsContainer.innerHTML = template.container.replace('{content}', content);
+        $('#pinnedItemsContainer .pinButton').prop('title', 'Unpin note');
+    } else if (archived) {
+        nodeCache.archivedItemsContainer.innerHTML = template.container.replace('{content}', content);
+        $('#archivedItemsContainer .archiveButton').prop('title', 'Unarchive note');
+    } else {
+        nodeCache.itemsContainer.innerHTML = template.container.replace('{content}', content);
+        $('#itemsContainer .pinButton').prop('title', 'Pin note');
+        $('#itemsContainer .archiveButton').prop('title', 'Archive note');
+    }
+
+    // Enable bootstrap tooltips
+    $('[data-toggle="tooltip"]').tooltip();
+    $('.card').mouseenter(function () {
+        $(this).find('#noteActionsButtons').fadeIn(200);
+    }).mouseleave(function () {
+        $(this).find('#noteActionsButtons').fadeOut(200);
+    });
+}
+
+// get pinned items
+// on success render items
+function refreshPinnedContent() {
+    notesDatabase.notes.where({
+        noteStatus: 1,
+        notePinned: 1
+    }).count().then(function (data) {
+        // if we are on the archive page, do not show the pinned or all items headers
+        // if we are on the archive page, do not show the pinned or all items headers
+        if (data > 0 && $('#archivedItemsHeader').is(":hidden")) {
+            $('#pinnedItemsHeader').show();
+        } else {
+            $('#pinnedItemsHeader').hide();
+        }
+    });
+    return notesDatabase.notes.where({
+        noteStatus: 1,
+        notePinned: 1
+    }).toArray().then(function (data) {
+        (renderItems(data, true, false));
+    });
+}
+
+// get items that are not pinned
+// on success render items
+function refreshContent() {
+    notesDatabase.notes.where({
+        noteStatus: 1,
+        notePinned: 0
+    }).count().then(function (data) {
+        // if we are on the archive page, do not show the pinned or all items headers
+        if (data > 0 && $('#archivedItemsHeader').is(":hidden")) {
+            $('#itemsHeader').show();
+        } else {
+            $('#itemsHeader').hide();
+        }
+    });
+    return notesDatabase.notes.where({
+        noteStatus: 1,
+        notePinned: 0
+    }).toArray().then(function (data) {
+        (renderItems(data, false, false));
+    });
+}
+
+// get archived items
+// on success render items
+function refreshArchivedContent() {
+    return notesDatabase.notes.where({
+        noteStatus: 2,
+        notePinned: 0
+    }).toArray().then(function (data) {
+        (renderItems(data, false, true));
+    });
+}
+
+function noteColors(selectId, selectedColor = 'bg-white text-dark') {
+    var colors = {
+        'bg-primary text-white': 'Blue',
+        'bg-secondary text-white': 'Gray',
+        'bg-success text-white': 'Green',
+        'bg-danger text-white': 'Red',
+        'bg-warning text-dark': 'Orange',
+        'bg-info text-white': 'Light Blue',
+        'bg-dark text-white': 'Black',
+        'bg-white text-dark': 'White'
+    };
+    var select = $(selectId);
+    var options = select.prop('options');
+
+    // remove all the existing options
+    $('option', select).remove();
+
+    // loop through the options and add them to the select
+    $.each(colors, function (val, text) {
+        options[options.length] = new Option(text, val);
+    });
+    select.val(selectedColor);
+}
+
+function clearForm() {
+    ['noteTitle', 'noteContent'].forEach(function (id) {
+        nodeCache[id].value = '';
+    });
+}
+
+// get current date in DD-Mon-YYY format from: https://www.c-sharpcorner.com/code/3548/get-current-date-in-dd-mon-yyy-format-in-javascriptjquery.aspx
+function dateToShortFormat(today) {
+    var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    var day = today.getDate();
+    var monthIndex = today.getMonth();
+    var year = today.getFullYear();
+
+    return day + ' ' + monthNames[monthIndex] + ' ' + year;
+}
+
 function initialize() {
     // Define user database
     userDatabase = new Dexie('userDatabase');
@@ -79,7 +281,7 @@ function addItem() {
         noteTitle: document.getElementById('noteTitle').value.trim(),
         noteContent: document.getElementById('noteContent').value.trim(),
         noteColor: document.getElementById('noteColor').value.trim(),
-        noteCreated: today.toShortFormat(),
+        noteCreated: dateToShortFormat(today),
         noteUpdated: '',
         noteStatus: 1,
         notePinned: 0
@@ -107,7 +309,7 @@ function editItem(id) {
             noteTitle: $('#noteTitle_' + id).val(),
             noteContent: $('#noteContent_' + id).val(),
             noteColor: $('#noteColor_' + id).val(),
-            noteUpdated: today.toShortFormat()
+            noteUpdated: dateToShortFormat(today)
         }).then(function () {
             refreshPinnedContent();
             refreshContent();
@@ -116,103 +318,11 @@ function editItem(id) {
     });
 }
 
-// get items that are not pinned
-// on success render items
-function refreshContent() {
-    notesDatabase.notes.where({
-        noteStatus: 1,
-        notePinned: 0
-    }).count().then(function (data) {
-        // if we are on the archive page, do not show the pinned or all items headers
-        (data > 0 && $('#archivedItemsHeader').is(":hidden")) ? $('#itemsHeader').show(): $('#itemsHeader').hide();
-    });
-    return notesDatabase.notes.where({
-        noteStatus: 1,
-        notePinned: 0
-    }).toArray().then(function (data) {
-        (renderItems(data, false, false));
-    });
-}
-
-// get pinned items
-// on success render items
-function refreshPinnedContent() {
-    notesDatabase.notes.where({
-        noteStatus: 1,
-        notePinned: 1
-    }).count().then(function (data) {
-        // if we are on the archive page, do not show the pinned or all items headers
-        (data > 0 && $('#archivedItemsHeader').is(":hidden")) ? $('#pinnedItemsHeader').show(): $('#pinnedItemsHeader').hide();
-    });
-    return notesDatabase.notes.where({
-        noteStatus: 1,
-        notePinned: 1
-    }).toArray().then(function (data) {
-        (renderItems(data, true, false));
-    });
-}
-
-// get archived items
-// on success render items
-function refreshArchivedContent() {
-    return notesDatabase.notes.where({
-        noteStatus: 2,
-        notePinned: 0
-    }).toArray().then(function (data) {
-        (renderItems(data, false, true));
-    });
-}
-
-function renderItems(data, pinned, archived) {
-    var content = '';
-    data.forEach(function (item) {
-        content += template.card.replace(/\{([^\}]+)\}/g, function (_, key) {
-            if (item[key] === undefined) {
-                return ''; // return nothing if input is empty 
-            } else {
-                return escapeHtml(item[key]);
-            }
-        });
-    });
-
-    if (pinned) {
-        nodeCache.pinnedItemsContainer.innerHTML = template.container.replace('{content}', content);
-        $('#pinnedItemsContainer .pinButton').prop('title', 'Unpin note');
-    } else if (archived) {
-        nodeCache.archivedItemsContainer.innerHTML = template.container.replace('{content}', content);
-        $('#archivedItemsContainer .archiveButton').prop('title', 'Unarchive note');
-    } else {
-        nodeCache.itemsContainer.innerHTML = template.container.replace('{content}', content);
-        $('#itemsContainer .pinButton').prop('title', 'Pin note');
-        $('#itemsContainer .archiveButton').prop('title', 'Archive note');
-    }
-
-    // Enable bootstrap tooltips
-    $('[data-toggle="tooltip"]').tooltip();
-    $('.card').mouseenter(function () {
-        $(this).find('#noteActionsButtons').fadeIn(200);
-    }).mouseleave(function () {
-        $(this).find('#noteActionsButtons').fadeOut(200);
-    });
-}
-
-function renderUsername() {
-    userDatabase.user.get(1).then(function (data) {
-        $('#renderUsername').text(`Welcome, ${data.name}!`);
-    });
-}
-
-function clearForm() {
-    ['noteTitle', 'noteContent'].forEach(function (id) {
-        nodeCache[id].value = '';
-    });
-}
-
 function pinItem(id) {
     notesDatabase.notes.get(id).then(function (item) {
         notesDatabase.notes.update(id, {
             noteStatus: 1,
-            notePinned: (item.notePinned == 1) ? 0 : 1,
+            notePinned: (item.notePinned === 1) ? 0 : 1,
         }).then(function () {
             $('[data-toggle="tooltip"]').tooltip('dispose'); // dispose button tooltip as it remains there after click
             refreshPinnedContent();
@@ -283,55 +393,6 @@ function logout() {
     });
 }
 
-// items template
-var template = {
-    card: '<div id="noteId_{noteId}" class="card mb-3 {noteColor}"><div class="card-body p-3">' +
-        '<h5 class="card-title mb-0">{noteTitle}</h5>' +
-        '<p class="card-text mb-0">{noteContent}</p>' +
-        '<div id="noteActions">' +
-        '<div id="noteActionsButtons">' +
-        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Edit note" onclick="editItemModal({noteId})"><i class="fa fa-pencil-alt"></i></button>' +
-        '<button type="button" class="btn {noteColor} pinButton" data-toggle="tooltip" title="" onclick="pinItem({noteId})"><i class="fa fa-thumbtack"></i></button>' +
-        '<button type="button" class="btn {noteColor} archiveButton" data-toggle="tooltip" title="Archive note" onclick="archiveItem({noteId})"><i class="fa fa-archive"></i></button>' +
-        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Delete note" onclick="deleteItemModal({noteId})"><i class="fa fa-trash-alt"></i></button>' +
-        '</div></div>' +
-        '<small class="float-right mb-2 font-weight-light font-italic">Created: {noteCreated}</small>' +
-        '</div></div>',
-    container: '<div class="card-columns">{content}</div>',
-    editItemModal: '<div class="modal fade" id="editItemModal_{noteId}" tabindex="-1" role="dialog" aria-hidden="true">' +
-        '<div class="modal-dialog modal-dialog-centered" role="document">' +
-        '<div class="modal-content">' +
-        '<div class="modal-header">' +
-        '<h5 class="modal-title">Edit note #{noteId}</h5>' +
-        '<button type="button" class="close" data-dismiss="modal" aria-label="Close">' +
-        '<span aria-hidden="true">&times;</span>' +
-        '</button>' +
-        '</div>' +
-        '<div class="modal-body">' +
-        '<form id="editItemForm">' +
-        '<label for="noteTitle_{noteId}">Title</label>' +
-        '<input type="text" id="noteTitle_{noteId}" class="form-control mb-4" value="{noteTitle}">' +
-        '<label for="noteContent_{noteId}">Content</label>' +
-        '<textarea id="noteContent_{noteId}" class="form-control mb-4" required>{noteContent}</textarea>' +
-        '<label for="noteColor_{noteId}">Color</label>' +
-        '<select class="custom-select mb-4" id="noteColor_{noteId}">' +
-        '</select>' +
-        '<button type="submit" class="btn btn-primary float-right ml-2">Save note</button>' +
-        '<button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>' +
-        '</form></div></div></div></div>',
-    editItemModalContainer: '{content}',
-    deleteItemModal: '<div class="modal fade" id="deleteItemModal_{noteId}" tabindex="-1" role="dialog" aria-hidden="true">' +
-        '<div class="modal-dialog modal-dialog-centered" role="document">' +
-        '<div class="modal-content">' +
-        '<div class="modal-body">' +
-        '<p class="text-center">This will permanently delete the item.</p>' +
-        '</div>' +
-        '<div class="modal-footer">' +
-        '<button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>' +
-        '<button type="submit" class="btn btn-sm btn-primary" data-dismiss="modal" onclick="deleteItem({noteId})">Delete</button>' +
-        '</div></div></div></div>'
-};
-
 function viewAll() {
     $('#pinnedItemsHeader').show();
     $('#pinnedItemsContainer').show();
@@ -352,64 +413,6 @@ function viewArchived() {
     $('#archivedItemsContainer').show();
     refreshArchivedContent();
 }
-
-function noteColors(selectId, selectedColor = 'bg-white text-dark') {
-    let colors = {
-        'bg-primary text-white': 'Blue',
-        'bg-secondary text-white': 'Gray',
-        'bg-success text-white': 'Green',
-        'bg-danger text-white': 'Red',
-        'bg-warning text-dark': 'Orange',
-        'bg-info text-white': 'Light Blue',
-        'bg-dark text-white': 'Black',
-        'bg-white text-dark': 'White'
-    };
-    let select = $(selectId);
-    let options = select.prop('options');
-
-    // remove all the existing options
-    $('option', select).remove();
-
-    // loop through the options and add them to the select
-    $.each(colors, function (val, text) {
-        options[options.length] = new Option(text, val);
-    });
-    select.val(selectedColor);
-}
-
-// escapeHtml function from: https://stackoverflow.com/a/12034334/4007492
-var entityMap = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-    '/': '&#x2F;',
-    '`': '&#x60;',
-    '=': '&#x3D;'
-};
-
-function escapeHtml(string) {
-    return String(string).replace(/[&<>"'`=\/]/g, function (s) {
-        return entityMap[s];
-    });
-}
-
-
-// get current date in DD-Mon-YYY format from: https://stackoverflow.com/a/27480352/4007492
-Date.prototype.toShortFormat = function () {
-    var month_names = ['Jan', 'Feb', 'Mar',
-        'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep',
-        'Oct', 'Nov', 'Dec'
-    ];
-
-    var day = this.getDate();
-    var month_index = this.getMonth();
-    var year = this.getFullYear();
-
-    return day + ' ' + month_names[month_index] + ' ' + year;
-};
 
 // export some functions to the outside to
 // make the onclick='' attributes work.
