@@ -44,6 +44,7 @@ Some other features include:
 - multiple users
 - add images/videos to the notes
 - categorize notes with a label
+- add notifications to user after action is done
 - drag and drop features
 - instead of delete confirmation add "Undo" option, add "Bin" page
 - add toasts for notifications
@@ -67,6 +68,10 @@ To run locally, you can clone this repository directly into the editor of your c
 
 The photo used on the login page was obtained from [Pexels](https://www.pexels.com/).
 
+### Acknowledgements
+
+Got inspired from Google Keep note taking app.
+
 ## To Do
 
 - [x] Add demo link
@@ -84,4 +89,4 @@ The photo used on the login page was obtained from [Pexels](https://www.pexels.c
 - [ ] Credits:
   - [ ] content
   - [x] media
-  - [ ] acknowledgements
+  - [x] acknowledgements
