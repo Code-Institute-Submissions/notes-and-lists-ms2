@@ -5,7 +5,7 @@ $(function () { //shorthand document.ready function
         $('#content-section').hide();
         // do IE stuff
         let unsupportedBrowser = document.getElementById('unsupported-browser');
-        unsupportedBrowser.innerHTML = '<p><b>The browser you are using is not supported.</b><br>Some critical features are not available for your browser version. We only support the recent versions of major browsers like Chrome, Firefox, Safari, and Edge.</p>';
+        unsupportedBrowser.innerHTML = '<p><b>The browser you are using is not supported.</b><br>Some critical features are not available for your browser version. We only support the recent versions of major browsers like Chrome, Firefox, Safari, and Edge at the moment.</p>';
         unsupportedBrowser.style.display = 'block';
     } else {
         // initialize app

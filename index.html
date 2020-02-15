@@ -39,8 +39,10 @@
                             </form>
                         </div>
                         <div class="mt-auto p-2">
-                            <button type="button" class="btn btn-link text-decoration-none text-muted">Privacy</button>
-                            <button type="button" class="btn btn-link text-decoration-none text-muted">Terms</button>
+                            <a href="https://www.termsfeed.com/privacy-policy/febb02aeb93a39acafd138a748d1818e"
+                                class="btn btn-link text-decoration-none text-muted" target="_blank">Privacy</a>
+                            <a href="https://www.termsfeed.com/terms-conditions/b3e7227ee62760e2f1e5aa011914561b"
+                                class="btn btn-link text-decoration-none text-muted" target="_blank">Terms</a>
                         </div>
                     </div>
                 </div>
@@ -151,6 +153,23 @@
 
     <div id="editModalContainer"></div>
     <div id="deleteModalContainer"></div>
+
+    <div class="modal fade" id="policyModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Privacy Policy</h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script>

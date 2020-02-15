@@ -99,31 +99,26 @@ body {
 #renderUsername {
   font-size: 32px;
 }
-/*------------------------------------------------------------------
-[ Responsive ]*/
 
-/*Small devices (landscape phones, 576px and up)*/
+/* responsive */
 @media (min-width: 576px) {
   .login-card {
     max-width: 500px;
   }
 }
 
-/*Medium devices (tablets, 768px and up)*/
 @media (min-width: 768px) {
   .login-card {
     max-width: 600px;
   }
 }
 
-/*Large devices (desktops, 992px and up)*/
 @media (min-width: 992px) {
   .login-card {
     max-width: 900px;
   }
 }
 
-/*Extra large devices (large desktops, 1200px and up)*/
 @media (min-width: 1200px) {
   .login-card {
     max-width: 1000px;

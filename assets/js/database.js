@@ -34,15 +34,20 @@ var template = {
         '<p class="card-text mb-0">{noteContent}</p>' +
         '<div id="noteActions">' +
         '<div id="noteActionsButtons">' +
-        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Edit note" onclick="editItemModal({noteId})"><i class="fa fa-pencil-alt"></i></button>' +
-        '<button type="button" class="btn {noteColor} pinButton" data-toggle="tooltip" title="" onclick="pinItem({noteId})"><i class="fa fa-thumbtack"></i></button>' +
-        '<button type="button" class="btn {noteColor} archiveButton" data-toggle="tooltip" title="Archive note" onclick="archiveItem({noteId})"><i class="fa fa-archive"></i></button>' +
-        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Delete note" onclick="deleteItemModal({noteId})"><i class="fa fa-trash-alt"></i></button>' +
+        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Edit note"' +
+        'onclick="editItemModal({noteId})"><i class="fa fa-pencil-alt"></i></button>' +
+        '<button type="button" class="btn {noteColor} pinButton" data-toggle="tooltip" title=""' +
+        'onclick="pinItem({noteId})"><i class="fa fa-thumbtack"></i></button>' +
+        '<button type="button" class="btn {noteColor} archiveButton" data-toggle="tooltip"' +
+        'title="Archive note" onclick="archiveItem({noteId})"><i class="fa fa-archive"></i></button>' +
+        '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Delete note"' +
+        'onclick="deleteItemModal({noteId})"><i class="fa fa-trash-alt"></i></button>' +
         '</div></div>' +
         '<small class="float-right mb-2 font-weight-light font-italic">Created: {noteCreated}</small>' +
         '</div></div>',
     container: '<div class="card-columns">{content}</div>',
-    editItemModal: '<div class="modal fade" id="editItemModal_{noteId}" tabindex="-1" role="dialog" aria-hidden="true">' +
+    editItemModal: '<div class="modal fade" id="editItemModal_{noteId}"' +
+        'tabindex="-1" role="dialog" aria-hidden="true">' +
         '<div class="modal-dialog modal-dialog-centered" role="document">' +
         '<div class="modal-content">' +
         '<div class="modal-header">' +
@@ -64,7 +69,8 @@ var template = {
         '<button type="button" class="btn btn-secondary float-right" data-dismiss="modal">Close</button>' +
         '</form></div></div></div></div>',
     editItemModalContainer: '{content}',
-    deleteItemModal: '<div class="modal fade" id="deleteItemModal_{noteId}" tabindex="-1" role="dialog" aria-hidden="true">' +
+    deleteItemModal: '<div class="modal fade" id="deleteItemModal_{noteId}"' +
+        'tabindex="-1" role="dialog" aria-hidden="true">' +
         '<div class="modal-dialog modal-dialog-centered" role="document">' +
         '<div class="modal-content">' +
         '<div class="modal-body">' +
@@ -72,7 +78,8 @@ var template = {
         '</div>' +
         '<div class="modal-footer">' +
         '<button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>' +
-        '<button type="submit" class="btn btn-sm btn-primary" data-dismiss="modal" onclick="deleteItem({noteId})">Delete</button>' +
+        '<button type="submit" class="btn btn-sm btn-primary" data-dismiss="modal"' +
+        'onclick="deleteItem({noteId})">Delete</button>' +
         '</div></div></div></div>'
 };
 
@@ -195,7 +202,8 @@ function clearForm() {
     });
 }
 
-// get current date in DD-Mon-YYY format from: https://www.c-sharpcorner.com/code/3548/get-current-date-in-dd-mon-yyy-format-in-javascriptjquery.aspx
+// get current date in DD-Mon-YYY format from:
+// https://www.c-sharpcorner.com/code/3548/get-current-date-in-dd-mon-yyy-format-in-javascriptjquery.aspx
 function dateToShortFormat(today) {
     var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     var day = today.getDate();
@@ -243,7 +251,10 @@ function initialize() {
     refreshArchivedContent();
 
     // create references for the nodes that we have to work with
-    ['noteTitle', 'noteContent', 'noteColor', 'pinnedItemsContainer', 'itemsContainer', 'archivedItemsContainer', 'editModalContainer', 'deleteModalContainer'].forEach(function (id) {
+    ['noteTitle', 'noteContent', 'noteColor', 'pinnedItemsContainer',
+        'itemsContainer', 'archivedItemsContainer', 'editModalContainer',
+        'deleteModalContainer'
+    ].forEach(function (id) {
         nodeCache[id] = document.getElementById(id);
     });
 
@@ -261,11 +272,12 @@ function addUser() {
     userDatabase.transaction('rw', userDatabase.user, function () {
         userDatabase.user.add({
             name: username
+        }).then(function () {
+            renderUsername();
+            $('#login-section').hide();
+            $('#header-section').show();
+            $('#content-section').show().addClass('d-flex');
         });
-        //console.log('Woot! Did it');
-        $('#login-section').hide();
-        $('#header-section').show();
-        $('#content-section').show().addClass('d-flex');
     }).catch(function (e) {
         console.error(e.stack);
     });
@@ -349,7 +361,9 @@ function archiveItem(id) {
 // edit item modal
 function editItemModal(id) {
     notesDatabase.notes.get(id).then(function (data) {
-        var content = template.editItemModal.replace(/{noteId}/g, data.noteId).replace(/{noteTitle}/g, data.noteTitle).replace(/{noteContent}/g, data.noteContent);
+        var content = template.editItemModal.replace(/{noteId}/g, data.noteId)
+            .replace(/{noteTitle}/g, data.noteTitle)
+            .replace(/{noteContent}/g, data.noteContent);
 
         nodeCache.editModalContainer.innerHTML = template.editItemModalContainer.replace('{content}', content);
         noteColors('#noteColor_' + id, data.noteColor);
