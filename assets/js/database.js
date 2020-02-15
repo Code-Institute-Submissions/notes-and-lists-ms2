@@ -1,10 +1,8 @@
-var userDatabase; // new database variable
 var notesDatabase; // new database variable
-
 var nodeCache = {}; // new node array for page elements
 
 function renderUsername() {
-    userDatabase.user.get(1).then(function (data) {
+    notesDatabase.user.get(1).then(function (data) {
         $('#renderUsername').text(`Welcome, ${data.name}!`);
     });
 }
@@ -61,7 +59,7 @@ var template = {
         '<label for="noteTitle_{noteId}">Title</label>' +
         '<input type="text" id="noteTitle_{noteId}" class="form-control mb-4" value="{noteTitle}">' +
         '<label for="noteContent_{noteId}">Content</label>' +
-        '<textarea id="noteContent_{noteId}" class="form-control mb-4" required>{noteContent}</textarea>' +
+        '<textarea id="noteContent_{noteId}" class="form-control mb-4" placeholder="Required" required>{noteContent}</textarea>' +
         '<label for="noteColor_{noteId}">Color</label>' +
         '<select class="custom-select mb-4" id="noteColor_{noteId}">' +
         '</select>' +
@@ -135,7 +133,7 @@ function refreshPinnedContent() {
         noteStatus: 1,
         notePinned: 1
     }).toArray().then(function (data) {
-        (renderItems(data, true, false));
+        renderItems(data, true, false);
     });
 }
 
@@ -157,7 +155,7 @@ function refreshContent() {
         noteStatus: 1,
         notePinned: 0
     }).toArray().then(function (data) {
-        (renderItems(data, false, false));
+        renderItems(data, false, false);
     });
 }
 
@@ -168,7 +166,7 @@ function refreshArchivedContent() {
         noteStatus: 2,
         notePinned: 0
     }).toArray().then(function (data) {
-        (renderItems(data, false, true));
+        renderItems(data, false, true);
     });
 }
 
@@ -183,8 +181,6 @@ function noNotes() {
             noteStatus: 1,
             notePinned: 1
         }).count().then(function (pinnedNotes) {
-            console.log('pinned' + pinnedNotes);
-            console.log('notes' + notes);
             if (notes > 0 || pinnedNotes > 0) {
                 $('#noNotesInfo').hide();
             } else {
@@ -194,6 +190,10 @@ function noNotes() {
     });
 }
 
+// get the select option for note colors
+// for a new note get "#noteColor" as id and for edit form get "#noteColor_id"
+// get the selected color when editing a note
+// return the select
 function noteColors(selectId, selectedColor = 'bg-white text-dark') {
     var colors = {
         'bg-primary text-white': 'Blue',
@@ -218,6 +218,8 @@ function noteColors(selectId, selectedColor = 'bg-white text-dark') {
     select.val(selectedColor);
 }
 
+// clear the form after a new note is added
+// noteColor is not cleared as we can add a note with same color or change it
 function clearForm() {
     ['noteTitle', 'noteContent'].forEach(function (id) {
         nodeCache[id].value = '';
@@ -235,24 +237,24 @@ function dateToShortFormat(today) {
     return day + ' ' + monthNames[monthIndex] + ' ' + year;
 }
 
+// initialize all the required databases and functions
 function initialize() {
-    // Define user database
-    userDatabase = new Dexie('userDatabase');
-    userDatabase.version(1).stores({
+    // Define database
+    notesDatabase = new Dexie('notesDatabase');
+    notesDatabase.version(1).stores({
+        notes: '++noteId, noteTitle, noteContent, noteColor, noteCreated, noteUpdated, [notePinned+noteStatus]',
         user: '++id, name'
     });
 
     // check if user database exists
     // if true, we already have the user, hide the login section
     // if false, we need an user, show the login section
-    userDatabase.user.get(1).then(function (data) {
+    notesDatabase.user.get(1).then(function (data) {
         if (data === undefined) {
-            //console.log('Database doesn't exist');
             $('#login-section').show();
             $('#header-section').hide();
             $('#content-section').hide().removeClass('d-flex');
         } else {
-            //console.log('Database exists');
             $('#login-section').hide();
             $('#header-section').show();
             $('#content-section').show().addClass('d-flex');
@@ -260,12 +262,6 @@ function initialize() {
         }
     }).catch(function (e) {
         console.error(e.stack);
-    });
-
-    // Define notes database
-    notesDatabase = new Dexie('notesDatabase');
-    notesDatabase.version(1).stores({
-        notes: '++noteId, noteTitle, noteContent, noteColor, noteCreated, noteUpdated, [notePinned+noteStatus]'
     });
 
     refreshPinnedContent();
@@ -284,6 +280,7 @@ function initialize() {
     $('#archivedItemsContainer').hide();
 
     noteColors('#noteColor');
+    noNotes();
 }
 
 // add user in the database
@@ -291,8 +288,8 @@ function initialize() {
 function addUser() {
     var username = document.getElementById('userName').value.trim();
 
-    userDatabase.transaction('rw', userDatabase.user, function () {
-        userDatabase.user.add({
+    notesDatabase.transaction('rw', notesDatabase.user, function () {
+        notesDatabase.user.add({
             name: username
         }).then(function () {
             renderUsername();
@@ -324,7 +321,6 @@ function addItem() {
     // …and store them away.
     notesDatabase.transaction('rw', notesDatabase.notes, function () {
         notesDatabase.notes.add(data);
-        //console.log('Woot! Did it');
     }).then(function () {
         refreshContent();
         clearForm();
@@ -353,6 +349,8 @@ function editItem(id) {
     });
 }
 
+// pin or unpin item
+// toggle notePinned status and refresh all content
 function pinItem(id) {
     notesDatabase.notes.get(id).then(function (item) {
         notesDatabase.notes.update(id, {
@@ -367,6 +365,8 @@ function pinItem(id) {
     });
 }
 
+// archive or unarchive item
+// toggle notePinned status and refresh all content
 function archiveItem(id) {
     notesDatabase.notes.get(id).then(function (item) {
         notesDatabase.notes.update(id, {
@@ -419,6 +419,7 @@ function deleteItem(id) {
         });
 }
 
+// on user logout all the items and the user will get deleted from database
 function logout() {
     notesDatabase.delete().then(function () {
         userDatabase.delete().catch(function (e) {
@@ -451,6 +452,7 @@ function viewArchived() {
     $('#archivedItemsHeader').show();
     $('#archivedItemsContainer').show();
     refreshArchivedContent();
+    $('#noNotesInfo').hide();
 }
 
 // export some functions to the outside to

@@ -64,10 +64,10 @@
 
             <div class="collapse navbar-collapse" id="navbarToggler">
                 <ul class="navbar-nav ml-auto mt-0">
-                    <li class="nav-item active"><a class="nav-link" href="#">Home <span
-                                class="sr-only">(current)</span></a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="app.viewAll()">Notes</a></li>
                     <li class="nav-item"><a class="nav-link" href="#" data-toggle="modal"
                             data-target="#newNoteModal">New note</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="app.viewArchived()">Archive</a></li>
                 </ul>
                 <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#logoutModal">Log
                     out</button>
@@ -127,7 +127,7 @@
                         <input type="text" id="noteTitle" class="form-control mb-4">
 
                         <label for="noteContent">Content</label>
-                        <textarea id="noteContent" class="form-control mb-4" required></textarea>
+                        <textarea id="noteContent" class="form-control mb-4" placeholder="Required" required></textarea>
 
                         <label for="noteColor">Color</label>
                         <select class="custom-select mb-4" id="noteColor">
