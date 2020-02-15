@@ -84,7 +84,6 @@
                     onclick="app.viewAll()"><i class="fa fa-sticky-note"></i> Notes</button>
                 <button type="button" class="btn btn-outline-dark btn-lg btn-block text-left rounded-0 border-0"
                     data-toggle="modal" data-target="#newNoteModal"><i class="fa fa-plus"></i> New note</button>
-                <hr class="m-1">
                 <button type="button" class="btn btn-outline-dark btn-lg btn-block text-left rounded-0 border-0"
                     onclick="app.viewArchived()"><i class="fa fa-archive"></i> Archive</button>
             </div>
@@ -94,7 +93,7 @@
         <!-- Items -->
         <div id="content-wrapper">
             <div class="col my-3">
-                <span class="font-weight-400 mb-0" id="renderUsername"></span>
+                <span class="font-weight-bold mb-0" id="renderUsername"></span>
             </div>
             <div class="container-fluid">
                 <h6 id="pinnedItemsHeader" class="text-uppercase mt-3">pinned</h6>
@@ -103,6 +102,10 @@
                 <div id="itemsContainer"></div>
                 <h6 id="archivedItemsHeader" class="text-uppercase mt-3">archived</h6>
                 <div id="archivedItemsContainer"></div>
+                <div id="noNotesInfo" class="text-center mt-5">
+                    <i class="fa fa-chalkboard fa-5x"></i>
+                    <div class="display-4 mt-5">No notes yet</div>
+                </div>
             </div>
         </div>
         <!-- /#content-wrapper -->

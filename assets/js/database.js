@@ -172,6 +172,28 @@ function refreshArchivedContent() {
     });
 }
 
+// check if there are published notes
+// if yes, hide the "no notes" message
+function noNotes() {
+    notesDatabase.notes.where({
+        noteStatus: 1,
+        notePinned: 0
+    }).count().then(function (notes) {
+        notesDatabase.notes.where({
+            noteStatus: 1,
+            notePinned: 1
+        }).count().then(function (pinnedNotes) {
+            console.log('pinned' + pinnedNotes);
+            console.log('notes' + notes);
+            if (notes > 0 || pinnedNotes > 0) {
+                $('#noNotesInfo').hide();
+            } else {
+                $('#noNotesInfo').show();
+            }
+        });
+    });
+}
+
 function noteColors(selectId, selectedColor = 'bg-white text-dark') {
     var colors = {
         'bg-primary text-white': 'Blue',
@@ -306,6 +328,7 @@ function addItem() {
     }).then(function () {
         refreshContent();
         clearForm();
+        noNotes();
     }).catch(function (e) {
         console.error(e.stack);
     });
@@ -354,6 +377,7 @@ function archiveItem(id) {
             refreshPinnedContent();
             refreshContent();
             refreshArchivedContent();
+            noNotes();
         });
     });
 }
@@ -391,6 +415,7 @@ function deleteItem(id) {
             refreshPinnedContent();
             refreshContent();
             refreshArchivedContent();
+            noNotes();
         });
 }
 
