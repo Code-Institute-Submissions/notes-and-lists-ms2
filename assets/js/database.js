@@ -41,7 +41,7 @@ var template = {
         '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Delete note"' +
         'onclick="deleteItemModal({noteId})"><i class="fa fa-trash-alt"></i></button>' +
         '</div></div>' +
-        '<small class="float-right mb-2 font-weight-light font-italic">Created: {noteCreated}</small>' +
+        '<small class="float-right mb-2 font-weight-light font-italic">{noteCreated}{noteUpdated}</small>' +
         '</div></div>',
     container: '<div class="card-columns">{content}</div>',
     editItemModal: '<div class="modal fade" id="editItemModal_{noteId}"' +
@@ -81,15 +81,18 @@ var template = {
         '</div></div></div></div>'
 };
 
+// render notes
 function renderItems(data, pinned, archived) {
     var content = '';
     data.forEach(function (item) {
         content += template.card.replace(/\{([^\}]+)\}/g, function (_, key) {
-            if (item[key] === undefined) {
-                return ''; // return nothing if input is empty 
-            } else {
-                return escapeHtml(item[key]);
+            if (key == 'noteCreated') {
+                item[key] = 'Created: ' + item[key];
+            } else if (key == 'noteUpdated' && item[key] !== '') {
+                item[key] = 'Updated: ' + item[key];
             }
+
+            return escapeHtml(item[key]) || '';
         });
     });
 
@@ -349,6 +352,15 @@ function editItem(id) {
     });
 }
 
+function itemDate(id) {
+    notesDatabase.notes.get(id).then(function (item) {
+
+        console.log(item.noteStatus);
+
+    });
+
+}
+
 // pin or unpin item
 // toggle notePinned status and refresh all content
 function pinItem(id) {
@@ -422,7 +434,7 @@ function deleteItem(id) {
 // on user logout all the items and the user will get deleted from database
 function logout() {
     notesDatabase.delete().then(function () {
-        userDatabase.delete().catch(function (e) {
+        notesDatabase.delete().catch(function (e) {
             console.error(e.stack);
         });
     }).catch(function (e) {
