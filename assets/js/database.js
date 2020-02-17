@@ -81,18 +81,29 @@ var template = {
         '</div></div></div></div>'
 };
 
+// check if note was edited
+// if yes, hide the "created date" and show "updated date" on item
+function isUpdated(id) {
+    notesDatabase.notes.get(id).then(function (item) {
+        if (item.noteUpdated !== '') {
+            $('#noteCreated_' + id).hide();
+        }
+    });
+}
+
 // render notes
 function renderItems(data, pinned, archived) {
     var content = '';
     data.forEach(function (item) {
         content += template.card.replace(/\{([^\}]+)\}/g, function (_, key) {
             if (key == 'noteCreated') {
-                item[key] = 'Created: ' + item[key];
+                return item[key] = '<span id="noteCreated_' + item['noteId'] + '">Created: ' + item[key] + '</span>';
             } else if (key == 'noteUpdated' && item[key] !== '') {
-                item[key] = 'Updated: ' + item[key];
+                isUpdated(item['noteId']);
+                return item[key] = '<span id="noteUpdated_' + item['noteId'] + '">Updated: ' + item[key] + '</span>';
+            } else {
+                return escapeHtml(item[key]) || '';
             }
-
-            return escapeHtml(item[key]) || '';
         });
     });
 

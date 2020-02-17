@@ -54,6 +54,8 @@ Some other features include:
 
 The app was tested on all major browsers, all of them working except Internet Explorer because of partial support for indexeddb. I decided to just show a message to Internet Explorer users that at the moment we are only supporting modern browsers. As a future plan, IndexedDBShim can be used to add support for Internet Explorer.
 
+While testing if all the functions are working, my mentor found one error on logout function, which was fixed.
+
 Tested HTML, CSS and JS for validation. All errors found were fixed.
 
 ## Deployment
