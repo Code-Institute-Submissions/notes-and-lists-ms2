@@ -29,7 +29,7 @@ function escapeHtml(string) {
 var template = {
     card: '<div id="noteId_{noteId}" class="card mb-3 {noteColor}"><div class="card-body p-3">' +
         '<h5 class="card-title mb-0">{noteTitle}</h5>' +
-        '<p class="card-text mb-0">{noteContent}</p>' +
+        '<p class="card-text mb-0 overflow-auto scrollable">{noteContent}</p>' +
         '<div id="noteActions">' +
         '<div id="noteActionsButtons">' +
         '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Edit note"' +
@@ -57,7 +57,8 @@ var template = {
         '<div class="modal-body">' +
         '<form id="editItemForm">' +
         '<label for="noteTitle_{noteId}">Title</label>' +
-        '<input type="text" id="noteTitle_{noteId}" class="form-control mb-4" value="{noteTitle}">' +
+        '<span id="remainingCharacters_{noteId}" class="float-right text-muted"></span>' +
+        '<input type="text" id="noteTitle_{noteId}" class="form-control mb-4" maxlength="60" value="{noteTitle}">' +
         '<label for="noteContent_{noteId}">Content</label>' +
         '<textarea id="noteContent_{noteId}" class="form-control mb-4" placeholder="Required" required>{noteContent}</textarea>' +
         '<label for="noteColor_{noteId}">Color</label>' +
@@ -416,6 +417,12 @@ function editItemModal(id) {
         noteColors('#noteColor_' + id, data.noteColor);
         $('#editItemModal_' + id).modal();
 
+        var maxLength = 60;
+        $('input').on('keyup', function () {
+            var characters = maxLength - $(this).val().length;
+            $('#remainingCharacters_' + id).text(characters);
+          });
+    
         $('#editItemForm').on('submit', function (e) {
             e.preventDefault(); //prevent form from submitting
             editItem(id);

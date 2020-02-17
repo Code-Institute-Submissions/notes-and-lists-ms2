@@ -54,7 +54,9 @@ Some other features include:
 
 The app was tested on all major browsers, all of them working except Internet Explorer because of partial support for indexeddb. I decided to just show a message to Internet Explorer users that at the moment we are only supporting modern browsers. As a future plan, IndexedDBShim can be used to add support for Internet Explorer.
 
-While testing if all the functions are working, my mentor found one error on logout function, which was fixed.
+While testing if all the functions are working, my mentor found one error on logout function, which was fixed. Also on same testing I realized that when an item is updated the created date is showing, changed to show the updated date.
+
+Tested notes with very long title and very long content and the output was not very good, limited the number of characters for the title and added overflow for the item content and now it looks much better.
 
 Tested HTML, CSS and JS for validation. All errors found were fixed.
 

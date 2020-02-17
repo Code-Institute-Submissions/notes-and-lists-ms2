@@ -1,4 +1,5 @@
 $(function () { //shorthand document.ready function
+    // if browser is ie, show an info message
     if (window.document.documentMode) {
         $('#login-section').hide();
         $('#header-section').hide();
@@ -27,5 +28,12 @@ $(function () { //shorthand document.ready function
         e.preventDefault(); //prevent form from submitting
         addItem();
         $('#newNoteModal').modal('hide');
+    });
+
+    // item title too long, this will limit the title to 60 characters
+    var maxLength = 60;
+    $('input').on('keyup', function () {
+        var characters = maxLength - $(this).val().length;
+        $('#remainingCharacters').text(characters);
     });
 });

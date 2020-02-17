@@ -124,7 +124,8 @@
                 <div class="modal-body">
                     <form id="newItemForm">
                         <label for="noteTitle">Title</label>
-                        <input type="text" id="noteTitle" class="form-control mb-4">
+                        <span id="remainingCharacters" class="float-right text-muted">60</span>
+                        <input type="text" id="noteTitle" class="form-control mb-4" maxlength="60">
 
                         <label for="noteContent">Content</label>
                         <textarea id="noteContent" class="form-control mb-4" placeholder="Required" required></textarea>
