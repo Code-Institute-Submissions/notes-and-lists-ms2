@@ -13,7 +13,7 @@ function renderUsername() {
 /* 
  * escapeHtml function from: https://stackoverflow.com/a/12034334/4007492
  */
-var entityMap = {
+const entityMap = {
     '&': '&amp;',
     '<': '&lt;',
     '>': '&gt;',
@@ -33,7 +33,7 @@ function escapeHtml(string) {
 /*
  * items template
  */
-var template = {
+const template = {
     card: '<div id="noteId_{noteId}" class="card mb-3 {noteColor}"><div class="card-body p-3">' +
         '<h5 class="card-title mb-0">{noteTitle}</h5>' +
         '<p class="card-text mb-0 overflow-auto scrollable">{noteContent}</p>' +
@@ -150,7 +150,6 @@ function refreshPinnedContent() {
         notePinned: 1
     }).count().then(function (data) {
         // if we are on the archive page, do not show the pinned or all items headers
-        // if we are on the archive page, do not show the pinned or all items headers
         if (data > 0 && $('#archivedItemsHeader').is(":hidden")) {
             $('#pinnedItemsHeader').show();
         } else {
@@ -160,7 +159,7 @@ function refreshPinnedContent() {
     return notesDatabase.notes.where({
         noteStatus: 1,
         notePinned: 1
-    }).toArray().then(function (data) {
+    }).reverse().sortBy('noteCreated').then(function (data) {
         renderItems(data, true, false);
     });
 }
@@ -184,7 +183,7 @@ function refreshContent() {
     return notesDatabase.notes.where({
         noteStatus: 1,
         notePinned: 0
-    }).toArray().then(function (data) {
+    }).reverse().sortBy('noteCreated').then(function (data) {
         renderItems(data, false, false);
     });
 }
@@ -197,7 +196,7 @@ function refreshArchivedContent() {
     return notesDatabase.notes.where({
         noteStatus: 2,
         notePinned: 0
-    }).toArray().then(function (data) {
+    }).reverse().sortBy('noteCreated').then(function (data) {
         renderItems(data, false, true);
     });
 }
@@ -267,7 +266,7 @@ function clearForm() {
 /*
  * get current date in DD-Mon-YYY format from:
  * https://www.c-sharpcorner.com/code/3548/get-current-date-in-dd-mon-yyy-format-in-javascriptjquery.aspx
-
+ */
 function dateToShortFormat(today) {
     var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     var day = today.getDate();
