@@ -64,10 +64,10 @@
 
             <div class="collapse navbar-collapse" id="navbarToggler">
                 <ul class="navbar-nav ml-auto mt-0">
-                    <li class="nav-item"><a class="nav-link" href="#" onclick="app.viewAll()">Notes</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" id="viewAll">Notes</a></li>
                     <li class="nav-item"><a class="nav-link" href="#" data-toggle="modal"
                             data-target="#newNoteModal">New note</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#" onclick="app.viewArchived()">Archive</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" id="viewArchived">Archive</a></li>
                 </ul>
                 <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#logoutModal">Log
                     out</button>
@@ -81,11 +81,11 @@
         <div class="border-right" id="sidebar-wrapper">
             <div class="sidebar-container p-2">
                 <button type="button" class="btn btn-outline-dark btn-lg btn-block text-left rounded-0 border-0"
-                    onclick="app.viewAll()"><i class="fa fa-sticky-note"></i> Notes</button>
+                    id="viewAll"><i class="fa fa-sticky-note"></i> Notes</button>
                 <button type="button" class="btn btn-outline-dark btn-lg btn-block text-left rounded-0 border-0"
                     data-toggle="modal" data-target="#newNoteModal"><i class="fa fa-plus"></i> New note</button>
                 <button type="button" class="btn btn-outline-dark btn-lg btn-block text-left rounded-0 border-0"
-                    onclick="app.viewArchived()"><i class="fa fa-archive"></i> Archive</button>
+                    id="viewArchived"><i class="fa fa-archive"></i> Archive</button>
             </div>
         </div>
         <!-- /#sidebar-wrapper -->
@@ -149,7 +149,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-sm btn-primary" onclick="app.logout()">Logout</button>
+                    <button type="submit" class="btn btn-sm btn-primary" id="userLogout">Logout</button>
                 </div>
             </div>
         </div>

@@ -1,13 +1,18 @@
 var notesDatabase; // new database variable
 var nodeCache = {}; // new node array for page elements
 
+/*
+ * get a welcome message for the user
+ */
 function renderUsername() {
     notesDatabase.user.get(1).then(function (data) {
         $('#renderUsername').text(`Welcome, ${data.name}!`);
     });
 }
 
-// escapeHtml function from: https://stackoverflow.com/a/12034334/4007492
+/* 
+ * escapeHtml function from: https://stackoverflow.com/a/12034334/4007492
+ */
 var entityMap = {
     '&': '&amp;',
     '<': '&lt;',
@@ -25,7 +30,9 @@ function escapeHtml(string) {
     });
 }
 
-// items template
+/*
+ * items template
+ */
 var template = {
     card: '<div id="noteId_{noteId}" class="card mb-3 {noteColor}"><div class="card-body p-3">' +
         '<h5 class="card-title mb-0">{noteTitle}</h5>' +
@@ -82,8 +89,10 @@ var template = {
         '</div></div></div></div>'
 };
 
-// check if note was edited
-// if yes, hide the "created date" and show "updated date" on item
+/*
+ * check if note was edited
+ * if yes, hide the "created date" and show "updated date" on item
+ */
 function isUpdated(id) {
     notesDatabase.notes.get(id).then(function (item) {
         if (item.noteUpdated !== '') {
@@ -92,7 +101,9 @@ function isUpdated(id) {
     });
 }
 
-// render notes
+/*
+ * render notes
+ */
 function renderItems(data, pinned, archived) {
     var content = '';
     data.forEach(function (item) {
@@ -129,8 +140,10 @@ function renderItems(data, pinned, archived) {
     });
 }
 
-// get pinned items
-// on success render items
+/*
+ * get pinned items
+ * on success render items
+ */
 function refreshPinnedContent() {
     notesDatabase.notes.where({
         noteStatus: 1,
@@ -152,8 +165,10 @@ function refreshPinnedContent() {
     });
 }
 
-// get items that are not pinned
-// on success render items
+/*
+ * get items that are not pinned
+ * on success render items
+ */
 function refreshContent() {
     notesDatabase.notes.where({
         noteStatus: 1,
@@ -174,8 +189,10 @@ function refreshContent() {
     });
 }
 
-// get archived items
-// on success render items
+/*
+ * get archived items
+ * on success render items
+ */
 function refreshArchivedContent() {
     return notesDatabase.notes.where({
         noteStatus: 2,
@@ -185,8 +202,10 @@ function refreshArchivedContent() {
     });
 }
 
-// check if there are published notes
-// if yes, hide the "no notes" message
+/*
+ * check if there are published notes
+ * if yes, hide the "no notes" message
+ */
 function noNotes() {
     notesDatabase.notes.where({
         noteStatus: 1,
@@ -205,10 +224,12 @@ function noNotes() {
     });
 }
 
-// get the select option for note colors
-// for a new note get "#noteColor" as id and for edit form get "#noteColor_id"
-// get the selected color when editing a note
-// return the select
+/*
+ * get the select option for note colors
+ * for a new note get "#noteColor" as id and for edit form get "#noteColor_id"
+ * get the selected color when editing a note
+ * return the select
+ */
 function noteColors(selectId, selectedColor = 'bg-white text-dark') {
     var colors = {
         'bg-primary text-white': 'Blue',
@@ -233,16 +254,20 @@ function noteColors(selectId, selectedColor = 'bg-white text-dark') {
     select.val(selectedColor);
 }
 
-// clear the form after a new note is added
-// noteColor is not cleared as we can add a note with same color or change it
+/*
+ * clear the form after a new note is added
+ * noteColor is not cleared as we can add a note with same color or change it
+ */
 function clearForm() {
     ['noteTitle', 'noteContent'].forEach(function (id) {
         nodeCache[id].value = '';
     });
 }
 
-// get current date in DD-Mon-YYY format from:
-// https://www.c-sharpcorner.com/code/3548/get-current-date-in-dd-mon-yyy-format-in-javascriptjquery.aspx
+/*
+ * get current date in DD-Mon-YYY format from:
+ * https://www.c-sharpcorner.com/code/3548/get-current-date-in-dd-mon-yyy-format-in-javascriptjquery.aspx
+
 function dateToShortFormat(today) {
     var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     var day = today.getDate();
@@ -252,7 +277,9 @@ function dateToShortFormat(today) {
     return day + ' ' + monthNames[monthIndex] + ' ' + year;
 }
 
-// initialize all the required databases and functions
+/*
+ * initialize all the required databases and functions
+ */
 function initialize() {
     // Define database
     notesDatabase = new Dexie('notesDatabase');
@@ -298,8 +325,10 @@ function initialize() {
     noNotes();
 }
 
-// add user in the database
-// we can hide the login section and show content after that
+/*
+ * add user in the database
+ * we can hide the login section and show content after that
+ */
 function addUser() {
     var username = document.getElementById('userName').value.trim();
 
@@ -317,9 +346,11 @@ function addUser() {
     });
 }
 
-// add item to database
-// create a data array for all the data from inputs the store it in the database
-// after data is added we can refresh content and clear the form so we can add more items
+/*
+ * add item to database
+ *create a data array for all the data from inputs the store it in the database
+ *after data is added we can refresh content and clear the form so we can add more items
+ */
 function addItem() {
     // read data from inputs…
     var today = new Date();
@@ -345,8 +376,10 @@ function addItem() {
     });
 }
 
-// edit item
-// create a data array for all the data from inputs the store it in the database
+/*
+ * edit item
+ * get all the data from inputs then update it in the database
+ */
 function editItem(id) {
     var today = new Date();
 
@@ -364,17 +397,10 @@ function editItem(id) {
     });
 }
 
-function itemDate(id) {
-    notesDatabase.notes.get(id).then(function (item) {
-
-        console.log(item.noteStatus);
-
-    });
-
-}
-
-// pin or unpin item
-// toggle notePinned status and refresh all content
+/*
+ * pin or unpin item
+ * toggle notePinned status and refresh all content
+ */
 function pinItem(id) {
     notesDatabase.notes.get(id).then(function (item) {
         notesDatabase.notes.update(id, {
@@ -389,8 +415,10 @@ function pinItem(id) {
     });
 }
 
-// archive or unarchive item
-// toggle notePinned status and refresh all content
+/*
+ * archive or unarchive item
+ * toggle notePinned status and refresh all content
+ */
 function archiveItem(id) {
     notesDatabase.notes.get(id).then(function (item) {
         notesDatabase.notes.update(id, {
@@ -406,7 +434,9 @@ function archiveItem(id) {
     });
 }
 
-// edit item modal
+/*
+ * edit item modal
+ */
 function editItemModal(id) {
     notesDatabase.notes.get(id).then(function (data) {
         var content = template.editItemModal.replace(/{noteId}/g, data.noteId)
@@ -421,8 +451,8 @@ function editItemModal(id) {
         $('input').on('keyup', function () {
             var characters = maxLength - $(this).val().length;
             $('#remainingCharacters_' + id).text(characters);
-          });
-    
+        });
+
         $('#editItemForm').on('submit', function (e) {
             e.preventDefault(); //prevent form from submitting
             editItem(id);
@@ -431,13 +461,17 @@ function editItemModal(id) {
     });
 }
 
-// delete item modal, get confirmation before delete
+/*
+ * delete item modal, get confirmation before delete
+ */
 function deleteItemModal(id) {
     nodeCache.deleteModalContainer.innerHTML = template.deleteItemModal.replace(/{noteId}/g, id);
     $('#deleteItemModal_' + id).modal();
 }
 
-// delete item
+/*
+ * delete item
+ */
 function deleteItem(id) {
     notesDatabase.notes.where('noteId').equals(id).delete()
         .then(function () {
@@ -449,7 +483,9 @@ function deleteItem(id) {
         });
 }
 
-// on user logout all the items and the user will get deleted from database
+/*
+ * on user logout all the items and the user will get deleted from database
+ */
 function logout() {
     notesDatabase.delete().then(function () {
         notesDatabase.delete().catch(function (e) {
@@ -462,7 +498,19 @@ function logout() {
         $('#logoutModal').modal('hide');
     });
 }
+/*
+ * if user clicks on the logout button, 
+ * delete all items and the user and show the login form
+ */
+$("#userLogout").click(function (e) {
+    e.preventDefault();
+    logout();
+});
 
+/*
+ * if user clicks on the view all button, 
+ * hide archived items and show all items
+ */
 function viewAll() {
     $('#pinnedItemsHeader').show();
     $('#pinnedItemsContainer').show();
@@ -473,7 +521,15 @@ function viewAll() {
     refreshPinnedContent();
     refreshContent();
 }
+$("#viewAll").click(function (e) {
+    e.preventDefault();
+    viewAll();
+});
 
+/*
+ * if user clicks on the view archived button, 
+ * hide all items and show the archived items
+ */
 function viewArchived() {
     $('#pinnedItemsHeader').hide();
     $('#pinnedItemsContainer').hide();
@@ -484,15 +540,7 @@ function viewArchived() {
     refreshArchivedContent();
     $('#noNotesInfo').hide();
 }
-
-// export some functions to the outside to
-// make the onclick='' attributes work.
-window.app = {
-    initialize: initialize,
-    addUser: addUser,
-    addItem: addItem,
-    editItem: editItem,
-    viewAll: viewAll,
-    viewArchived: viewArchived,
-    logout: logout
-};
+$("#viewArchived").click(function (e) {
+    e.preventDefault();
+    viewArchived();
+});
