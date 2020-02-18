@@ -35,9 +35,9 @@ $(function () { //shorthand document.ready function
     /*
      * item title too long, this will limit the title to 60 characters
      */
-    var maxLength = 60;
+    let maxLength = 60;
     $('input').on('keyup', function () {
-        var characters = maxLength - $(this).val().length;
+        let characters = maxLength - $(this).val().length;
         $('#remainingCharacters').text(characters);
     });
 });

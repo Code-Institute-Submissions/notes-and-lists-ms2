@@ -105,7 +105,7 @@ function isUpdated(id) {
  * render notes
  */
 function renderItems(data, pinned, archived) {
-    var content = '';
+    let content = '';
     data.forEach(function (item) {
         content += template.card.replace(/\{([^\}]+)\}/g, function (_, key) {
             if (key == 'noteCreated') {
@@ -230,7 +230,7 @@ function noNotes() {
  * return the select
  */
 function noteColors(selectId, selectedColor = 'bg-white text-dark') {
-    var colors = {
+    const colors = {
         'bg-primary text-white': 'Blue',
         'bg-secondary text-white': 'Gray',
         'bg-success text-white': 'Green',
@@ -240,8 +240,8 @@ function noteColors(selectId, selectedColor = 'bg-white text-dark') {
         'bg-dark text-white': 'Black',
         'bg-white text-dark': 'White'
     };
-    var select = $(selectId);
-    var options = select.prop('options');
+    let select = $(selectId);
+    let options = select.prop('options');
 
     // remove all the existing options
     $('option', select).remove();
@@ -268,10 +268,10 @@ function clearForm() {
  * https://www.c-sharpcorner.com/code/3548/get-current-date-in-dd-mon-yyy-format-in-javascriptjquery.aspx
  */
 function dateToShortFormat(today) {
-    var monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    var day = today.getDate();
-    var monthIndex = today.getMonth();
-    var year = today.getFullYear();
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    let day = today.getDate();
+    let monthIndex = today.getMonth();
+    let year = today.getFullYear();
 
     return day + ' ' + monthNames[monthIndex] + ' ' + year;
 }
@@ -329,7 +329,7 @@ function initialize() {
  * we can hide the login section and show content after that
  */
 function addUser() {
-    var username = document.getElementById('userName').value.trim();
+    let username = document.getElementById('userName').value.trim();
 
     notesDatabase.transaction('rw', notesDatabase.user, function () {
         notesDatabase.user.add({
@@ -352,8 +352,8 @@ function addUser() {
  */
 function addItem() {
     // read data from inputs…
-    var today = new Date();
-    var data = {
+    let today = new Date();
+    let data = {
         noteTitle: document.getElementById('noteTitle').value.trim(),
         noteContent: document.getElementById('noteContent').value.trim(),
         noteColor: document.getElementById('noteColor').value.trim(),
@@ -380,7 +380,7 @@ function addItem() {
  * get all the data from inputs then update it in the database
  */
 function editItem(id) {
-    var today = new Date();
+    let today = new Date();
 
     notesDatabase.notes.get(id).then(function () {
         notesDatabase.notes.update(id, {
@@ -438,7 +438,7 @@ function archiveItem(id) {
  */
 function editItemModal(id) {
     notesDatabase.notes.get(id).then(function (data) {
-        var content = template.editItemModal.replace(/{noteId}/g, data.noteId)
+        let content = template.editItemModal.replace(/{noteId}/g, data.noteId)
             .replace(/{noteTitle}/g, data.noteTitle)
             .replace(/{noteContent}/g, data.noteContent);
 
@@ -446,9 +446,9 @@ function editItemModal(id) {
         noteColors('#noteColor_' + id, data.noteColor);
         $('#editItemModal_' + id).modal();
 
-        var maxLength = 60;
+        let maxLength = 60;
         $('input').on('keyup', function () {
-            var characters = maxLength - $(this).val().length;
+            let characters = maxLength - $(this).val().length;
             $('#remainingCharacters_' + id).text(characters);
         });
 
@@ -520,7 +520,7 @@ function viewAll() {
     refreshPinnedContent();
     refreshContent();
 }
-$("#viewAll").click(function (e) {
+$(".viewAll").click(function (e) {
     e.preventDefault();
     viewAll();
 });
@@ -539,7 +539,7 @@ function viewArchived() {
     refreshArchivedContent();
     $('#noNotesInfo').hide();
 }
-$("#viewArchived").click(function (e) {
+$(".viewArchived").click(function (e) {
     e.preventDefault();
     viewArchived();
 });
