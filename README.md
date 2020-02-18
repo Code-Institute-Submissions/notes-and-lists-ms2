@@ -24,6 +24,10 @@ The scope of the application is for users to easily add new notes, pin important
 
 The application is a one page app which has a login page for first time users, after login the users have a top navbar, a collapsible sidebar and the main content. To a add a new note a modal will show with all the inputs, title is optional and content is required. All notes have and edit, pin, archive and delete option.
 
+### Surface
+
+The color scheme offers a white background with a brick-style effect and a gray navbar. The notes that can be added by users can be different colors and depending on note color, the text color will be black or white.
+
 ## Technologies
 
 1. HTML
