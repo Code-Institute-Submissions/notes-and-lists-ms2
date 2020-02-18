@@ -6,7 +6,7 @@ var nodeCache = {}; // new node array for page elements
  */
 function renderUsername() {
     notesDatabase.user.get(1).then(function (data) {
-        $('#renderUsername').text(`Welcome, ${data.name}!`);
+        $('.renderUsername').text(`Welcome, ${data.name}!`);
     });
 }
 
@@ -37,8 +37,8 @@ const template = {
     card: '<div id="noteId_{noteId}" class="card mb-3 {noteColor}"><div class="card-body p-3">' +
         '<h5 class="card-title mb-0">{noteTitle}</h5>' +
         '<p class="card-text mb-0 overflow-auto scrollable">{noteContent}</p>' +
-        '<div id="noteActions">' +
-        '<div id="noteActionsButtons">' +
+        '<div class="noteActions">' +
+        '<div class="noteActionsButtons">' +
         '<button type="button" class="btn {noteColor}" data-toggle="tooltip" title="Edit note"' +
         'onclick="editItemModal({noteId})"><i class="fa fa-pencil-alt"></i></button>' +
         '<button type="button" class="btn {noteColor} pinButton" data-toggle="tooltip" title=""' +
@@ -109,10 +109,12 @@ function renderItems(data, pinned, archived) {
     data.forEach(function (item) {
         content += template.card.replace(/\{([^\}]+)\}/g, function (_, key) {
             if (key == 'noteCreated') {
-                return item[key] = '<span id="noteCreated_' + item['noteId'] + '">Created: ' + item[key] + '</span>';
+                item[key] = '<span id="noteCreated_' + item['noteId'] + '">Created: ' + item[key] + '</span>';
+                return item[key];
             } else if (key == 'noteUpdated' && item[key] !== '') {
-                isUpdated(item['noteId']);
-                return item[key] = '<span id="noteUpdated_' + item['noteId'] + '">Updated: ' + item[key] + '</span>';
+                isUpdated(item.noteId);
+                item[key] = '<span id="noteUpdated_' + item['noteId'] + '">Updated: ' + item[key] + '</span>';
+                return item[key];
             } else {
                 return escapeHtml(item[key]) || '';
             }
@@ -134,9 +136,9 @@ function renderItems(data, pinned, archived) {
     // Enable bootstrap tooltips
     $('[data-toggle="tooltip"]').tooltip();
     $('.card').mouseenter(function () {
-        $(this).find('#noteActionsButtons').fadeIn(200);
+        $(this).find('.noteActionsButtons').fadeIn(200);
     }).mouseleave(function () {
-        $(this).find('#noteActionsButtons').fadeOut(200);
+        $(this).find('.noteActionsButtons').fadeOut(200);
     });
 }
 
@@ -292,13 +294,13 @@ function initialize() {
     // if false, we need an user, show the login section
     notesDatabase.user.get(1).then(function (data) {
         if (data === undefined) {
-            $('#login-section').show();
-            $('#header-section').hide();
-            $('#content-section').hide().removeClass('d-flex');
+            $('.login-section').show();
+            $('.header-section').hide();
+            $('.content-section').hide().removeClass('d-flex');
         } else {
-            $('#login-section').hide();
-            $('#header-section').show();
-            $('#content-section').show().addClass('d-flex');
+            $('.login-section').hide();
+            $('.header-section').show();
+            $('.content-section').show().addClass('d-flex');
             renderUsername();
         }
     }).catch(function (e) {
@@ -336,9 +338,9 @@ function addUser() {
             name: username
         }).then(function () {
             renderUsername();
-            $('#login-section').hide();
-            $('#header-section').show();
-            $('#content-section').show().addClass('d-flex');
+            $('.login-section').hide();
+            $('.header-section').show();
+            $('.content-section').show().addClass('d-flex');
         });
     }).catch(function (e) {
         console.error(e.stack);

@@ -3,11 +3,11 @@ $(function () { //shorthand document.ready function
      * if browser is ie, show an info message
      */
     if (window.document.documentMode) {
-        $('#login-section').hide();
-        $('#header-section').hide();
-        $('#content-section').hide();
+        $('.login-section').hide();
+        $('.header-section').hide();
+        $('.content-section').hide();
         // do IE stuff
-        let unsupportedBrowser = document.getElementById('unsupported-browser');
+        let unsupportedBrowser = document.getElementsByClassName('unsupported-browser');
         unsupportedBrowser.innerHTML = '<p><b>The browser you are using is not supported.</b><br>Some critical features are not available for your browser version. We only support the recent versions of major browsers like Chrome, Firefox, Safari, and Edge at the moment.</p>';
         unsupportedBrowser.style.display = 'block';
     } else {
@@ -18,7 +18,7 @@ $(function () { //shorthand document.ready function
     // sidebar toggle
     $("#sidebar-toggle").click(function (e) {
         e.preventDefault();
-        $("#content-section").toggleClass("toggled");
+        $(".content-section").toggleClass("toggled");
     });
 
     $('#loginForm').on('submit', function (e) {

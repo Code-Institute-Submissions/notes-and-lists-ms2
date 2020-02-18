@@ -5,7 +5,7 @@ body {
   font-family: "Ubuntu", sans-serif;
 }
 
-#unsupported-browser {
+.unsupported-browser {
   display: none;
   margin-left: auto;
   margin-right: auto;
@@ -15,15 +15,15 @@ body {
 
 .preloader {
   position: fixed;
-  left: 0px;
-  top: 0px;
+  left: 0;
+  top: 0;
   width: 100%;
   height: 100%;
   z-index: 9999;
   background: url("../../assets/images/loading.gif") 50% 50% no-repeat #ffffff;
 }
 
-#login-section {
+.login-section {
   height: 100%;
   display: -ms-flexbox;
   display: -webkit-box;
@@ -54,7 +54,7 @@ body {
   padding: 10px;
 }
 
-#sidebar-wrapper {
+.sidebar-wrapper {
   min-height: 100vh;
   margin-left: -15rem;
   -webkit-transition: margin 0.25s ease-out;
@@ -63,12 +63,12 @@ body {
   transition: margin 0.25s ease-out;
 }
 
-#sidebar-wrapper .sidebar-container {
+.sidebar-wrapper .sidebar-container {
   width: 15rem;
 }
 
 /* css pattern from: https://www.heropatterns.com/ */
-#content-wrapper {
+.content-wrapper {
   min-width: 100vw;
   background-color: #ffffff;
   background-image: url("data:image/svg+xml,%3Csvg width='42' height='44' viewBox='0 0 42 44' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='Page-1' fill='none' fill-rule='evenodd'%3E%3Cg id='brick-wall' fill='%23000000' fill-opacity='0.03'%3E%3Cpath d='M0 0h42v44H0V0zm1 1h40v20H1V1zM0 23h20v20H0V23zm22 0h20v20H22V23z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
@@ -78,17 +78,17 @@ body {
   height: 80vh;
 }
 
-#content-section.toggled #sidebar-wrapper {
+.content-section.toggled .sidebar-wrapper {
   margin-left: 0;
 }
 
-#noteActions {
+.noteActions {
   min-height: 38px;
 }
-#noteActionsButtons {
+.noteActionsButtons {
   display: none;
 }
-#renderUsername {
+.renderUsername {
   font-size: 32px;
 }
 
@@ -123,16 +123,16 @@ body {
   .login-card {
     max-width: 600px;
   }
-  #sidebar-wrapper {
+  .sidebar-wrapper {
     margin-left: 0;
   }
 
-  #content-wrapper {
+  .content-wrapper {
     min-width: 0;
     width: 100%;
   }
 
-  #content-section.toggled #sidebar-wrapper {
+  .content-section.toggled .sidebar-wrapper {
     margin-left: -15rem;
   }
 }

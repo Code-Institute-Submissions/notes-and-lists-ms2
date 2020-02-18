@@ -24,6 +24,16 @@ The scope of the application is for users to easily add new notes, pin important
 
 The application is a one page app which has a login page for first time users, after login the users have a top navbar, a collapsible sidebar and the main content. To a add a new note a modal will show with all the inputs, title is optional and content is required. All notes have and edit, pin, archive and delete option.
 
+### Skeleton
+
+[Landing wireframe](https://github.com/onisstudio/notes-and-lists-ms2/blob/master/wireframes/landing.png)
+[Landing mobile wireframe](https://github.com/onisstudio/notes-and-lists-ms2/blob/master/wireframes/landing%20(mobile%20landing).png)
+
+[Login wireframe](https://github.com/onisstudio/notes-and-lists-ms2/blob/master/wireframes/login%20page.png)
+[Login mobile wireframe](https://github.com/onisstudio/notes-and-lists-ms2/blob/master/wireframes/login%20page%20(mobile%20login).png)
+
+[New item form wireframe](https://github.com/onisstudio/notes-and-lists-ms2/blob/master/wireframes/new%20item%20form.png)
+
 ### Surface
 
 The color scheme offers a white background with a brick-style effect and a gray navbar. The notes that can be added by users can be different colors and depending on note color, the text color will be black or white.
@@ -83,13 +93,13 @@ Got inspired from Google Keep note taking app.
 ## To Do
 
 - [x] Add demo link
-- [ ] Add UX:
+- [x] Add UX:
   - [x] user stories
   - [x] strategy
   - [x] scope
   - [x] structure
-  - [ ] skeleton
-  - [ ] surface
+  - [x] skeleton
+  - [x] surface
 - [x] Technologies
 - [x] Features
 - [ ] Testing
