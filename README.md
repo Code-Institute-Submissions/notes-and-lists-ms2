@@ -74,7 +74,7 @@ While testing if all the functions are working, my mentor found one error on log
 
 Tested notes with very long title and very long content and the output was not very good, limited the number of characters for the title and added overflow for the item content and now it looks much better.
 
-Tested HTML, CSS and JS for validation. All errors found were fixed.
+Tested HTML, CSS and JS on the official validator services. No major issues found.
 
 ## Deployment
 

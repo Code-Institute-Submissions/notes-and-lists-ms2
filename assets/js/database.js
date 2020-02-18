@@ -110,11 +110,11 @@ function renderItems(data, pinned, archived) {
     data.forEach(function (item) {
         content += template.card.replace(/\{([^\}]+)\}/g, function (_, key) {
             if (key == 'noteCreated') {
-                item[key] = '<span id="noteCreated_' + item['noteId'] + '">Created: ' + item[key] + '</span>';
+                item[key] = '<span id="noteCreated_' + item.noteId + '">Created: ' + item[key] + '</span>';
                 return item[key];
             } else if (key == 'noteUpdated' && item[key] !== '') {
                 isUpdated(item.noteId);
-                item[key] = '<span id="noteUpdated_' + item['noteId'] + '">Updated: ' + item[key] + '</span>';
+                item[key] = '<span id="noteUpdated_' + item.noteId + '">Updated: ' + item[key] + '</span>';
                 return item[key];
             } else {
                 return escapeHtml(item[key]) || '';
