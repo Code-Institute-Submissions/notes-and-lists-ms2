@@ -10,7 +10,7 @@ A live demo can be found [here](https://onisstudio.github.io/notes-and-lists-ms2
 
 ### User Stories
 
-As a first time user you can input a new name and start adding new notes, you can select note color, pin notes, archive notes and delete them. All added notes will be stored on the browser`s database until they are deleted or user logs out.
+A new user can input a new name which will log in to the main app. After login the user can start adding new notes. When you add a new note you can write a title, which is optional, some content, which is required, and you can also select a background color for the note. After the note is added you can pin the note, which will show the note on top of all the other notes and later it can also be unpinned which will get the note back with all the other notes. The note can also be archived, which will send the note to the archive page and can be seen there at a later stage and from there it can be unarchived. The user can also edit a note, this will allow the user to change the title, content or color. The last thing that the user can do with the note is to delete it, which is a permanent action and cannot be undone.
 
 ### Strategy
 
@@ -27,10 +27,12 @@ The application is a one page app which has a login page for first time users, a
 ### Skeleton
 
 [Landing wireframe](https://github.com/onisstudio/notes-and-lists-ms2/blob/master/wireframes/landing.png)
-[Landing mobile wireframe](https://github.com/onisstudio/notes-and-lists-ms2/blob/master/wireframes/landing%20(mobile%20landing).png)
+
+[Landing mobile wireframe](<https://github.com/onisstudio/notes-and-lists-ms2/blob/master/wireframes/landing%20(mobile%20landing).png>)
 
 [Login wireframe](https://github.com/onisstudio/notes-and-lists-ms2/blob/master/wireframes/login%20page.png)
-[Login mobile wireframe](https://github.com/onisstudio/notes-and-lists-ms2/blob/master/wireframes/login%20page%20(mobile%20login).png)
+
+[Login mobile wireframe](<https://github.com/onisstudio/notes-and-lists-ms2/blob/master/wireframes/login%20page%20(mobile%20login).png>)
 
 [New item form wireframe](https://github.com/onisstudio/notes-and-lists-ms2/blob/master/wireframes/new%20item%20form.png)
 
@@ -89,6 +91,10 @@ The photo used on the login page was obtained from [Pexels](https://www.pexels.c
 ### Acknowledgements
 
 Got inspired from Google Keep note taking app.
+
+Used [this](https://www.c-sharpcorner.com/code/3548/get-current-date-in-dd-mon-yyy-format-in-javascriptjquery.aspx) piece of code to get current date in DD-Mon-YYY format.
+
+The brick style pattern for the background is from [Hero Patterns](https://www.heropatterns.com/).
 
 ## To Do
 

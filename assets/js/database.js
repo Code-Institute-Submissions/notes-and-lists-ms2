@@ -2,7 +2,7 @@ var notesDatabase; // new database variable
 var nodeCache = {}; // new node array for page elements
 
 /*
- * get a welcome message for the user
+ * get a welcome message for the user after login
  */
 function renderUsername() {
     notesDatabase.user.get(1).then(function (data) {
@@ -12,6 +12,7 @@ function renderUsername() {
 
 /* 
  * escapeHtml function from: https://stackoverflow.com/a/12034334/4007492
+ * this will escape all the html from the inputs
  */
 const entityMap = {
     '&': '&amp;',
@@ -279,7 +280,7 @@ function dateToShortFormat(today) {
 }
 
 /*
- * initialize all the required databases and functions
+ * initialize the database and all the required functions
  */
 function initialize() {
     // Define database
@@ -408,7 +409,7 @@ function pinItem(id) {
             noteStatus: 1,
             notePinned: (item.notePinned === 1) ? 0 : 1,
         }).then(function () {
-            $('[data-toggle="tooltip"]').tooltip('dispose'); // dispose button tooltip as it remains there after click
+            $('[data-toggle="tooltip"]').tooltip('dispose'); // dispose tooltip as it remains there after click
             refreshPinnedContent();
             refreshContent();
             refreshArchivedContent();
@@ -426,7 +427,7 @@ function archiveItem(id) {
             noteStatus: (item.noteStatus === 1) ? 2 : 1,
             notePinned: 0
         }).then(function () {
-            $('[data-toggle="tooltip"]').tooltip('dispose'); // dispose button tooltip as it remains there after click
+            $('[data-toggle="tooltip"]').tooltip('dispose'); // dispose tooltip as it remains there after click
             refreshPinnedContent();
             refreshContent();
             refreshArchivedContent();
@@ -476,7 +477,7 @@ function deleteItemModal(id) {
 function deleteItem(id) {
     notesDatabase.notes.where('noteId').equals(id).delete()
         .then(function () {
-            $('[data-toggle="tooltip"]').tooltip('dispose'); // dispose button tooltip as it remains there after click
+            $('[data-toggle="tooltip"]').tooltip('dispose'); // dispose tooltip as it remains there after click
             refreshPinnedContent();
             refreshContent();
             refreshArchivedContent();
@@ -499,6 +500,7 @@ function logout() {
         $('#logoutModal').modal('hide');
     });
 }
+
 /*
  * if user clicks on the logout button, 
  * delete all items and the user and show the login form
