@@ -95,22 +95,3 @@ Got inspired from Google Keep note taking app.
 Used [this](https://www.c-sharpcorner.com/code/3548/get-current-date-in-dd-mon-yyy-format-in-javascriptjquery.aspx) piece of code to get current date in DD-Mon-YYY format.
 
 The brick style pattern for the background is from [Hero Patterns](https://www.heropatterns.com/).
-
-## To Do
-
-- [x] Add demo link
-- [x] Add UX:
-  - [x] user stories
-  - [x] strategy
-  - [x] scope
-  - [x] structure
-  - [x] skeleton
-  - [x] surface
-- [x] Technologies
-- [x] Features
-- [ ] Testing
-- [x] Deployment
-- [ ] Credits:
-  - [ ] content
-  - [x] media
-  - [x] acknowledgements
